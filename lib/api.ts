@@ -1,4 +1,25 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4001/api';
+// Detectar ambiente e usar URL correta
+const getApiUrl = () => {
+  // Se houver variável de ambiente definida, usar ela
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  
+  // Se estiver no browser, verificar hostname
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    
+    // Produção
+    if (hostname === 'tokcash.com.br' || hostname === 'www.tokcash.com.br') {
+      return 'https://api.tokcash.com.br/api';
+    }
+  }
+  
+  // Desenvolvimento (padrão)
+  return 'http://localhost:4000/api';
+};
+
+const API_URL = getApiUrl();
 
 export interface ApiResponse<T = any> {
   data?: T;
