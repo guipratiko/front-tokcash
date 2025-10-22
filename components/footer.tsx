@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { Sparkles, Mail, Instagram, Youtube, Twitter, Github } from 'lucide-react'
 
 export function Footer() {
@@ -56,11 +57,14 @@ export function Footer() {
         <div className="grid grid-cols-2 md:grid-cols-6 gap-8 mb-12">
           {/* Logo e Descrição */}
           <div className="col-span-2 md:col-span-2">
-            <Link href="/" className="flex items-center gap-2 mb-4">
-              <Sparkles className="h-7 w-7 text-purple-600" />
-              <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                TokCash
-              </span>
+            <Link href="/" className="inline-block mb-4 group">
+              <Image 
+                src="/images/logos/LogoTokCash.png" 
+                alt="TokCash" 
+                width={180} 
+                height={60}
+                className="h-14 w-auto group-hover:scale-105 transition-transform"
+              />
             </Link>
             <p className="text-sm text-gray-600 mb-6 max-w-xs leading-relaxed">
               Plataforma de geração de prompts e vídeos virais com inteligência artificial. 

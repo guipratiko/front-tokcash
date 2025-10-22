@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
@@ -64,25 +65,23 @@ export default function LandingPage() {
           ? 'border-gray-200/50 backdrop-blur-xl bg-white/80 shadow-lg shadow-purple-100/50' 
           : 'border-white/20'
       }`}>
-        <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="max-w-7xl mx-auto px-6 py-1">
           <div className="flex justify-between items-center">
-            <ContentWrapper 
-              {...(isMounted && {
-                whileHover: { scale: 1.02 }
-              })}
-              className="flex items-center gap-2"
-            >
-              <div className="relative">
-                <Sparkles className="h-7 w-7 text-purple-600" />
-                <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-purple-500"></span>
-                </span>
-              </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                TokCash
-              </span>
-            </ContentWrapper>
+            <Link href="/" className="flex items-center">
+              <ContentWrapper 
+                {...(isMounted && {
+                  whileHover: { scale: 1.05 }
+                })}
+              >
+                <Image 
+                  src="/images/logos/LogoTokCash.png" 
+                  alt="TokCash" 
+                  width={240} 
+                  height={80}
+                  className="h-20 w-auto"
+                />
+              </ContentWrapper>
+            </Link>
 
             <div className="flex items-center gap-3">
               <Link href="/auth/login">

@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { useRouter, usePathname } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Sparkles, LogOut, Menu, X } from 'lucide-react'
@@ -43,20 +44,17 @@ export function Navbar() {
         ? 'border-gray-200/50 backdrop-blur-xl bg-white/80 shadow-lg shadow-purple-100/50' 
         : 'border-white/20'
     }`}>
-      <div className="max-w-7xl mx-auto px-6 py-4">
+      <div className="max-w-7xl mx-auto px-6 py-1">
         <div className="flex justify-between items-center">
           {/* Logo */}
           <Link href="/dashboard" className="flex items-center gap-2 group">
-            <div className="relative">
-              <Sparkles className="h-7 w-7 text-purple-600 group-hover:text-purple-700 transition-colors" />
-              <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-purple-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-3 w-3 bg-purple-500"></span>
-              </span>
-            </div>
-            <span className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-              TokCash
-            </span>
+            <Image 
+              src="/images/logos/LogoTokCash.png" 
+              alt="TokCash" 
+              width={240} 
+              height={80}
+              className="h-20 w-auto group-hover:scale-105 transition-transform"
+            />
           </Link>
 
           {/* Desktop Navigation */}

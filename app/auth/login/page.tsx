@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -50,12 +51,15 @@ export default function LoginPage() {
         className="w-full max-w-md relative z-10"
       >
         {/* Logo */}
-        <Link href="/" className="flex items-center justify-center gap-2 mb-8 group">
+        <Link href="/" className="flex items-center justify-center gap-3 mb-8 group">
           <ArrowLeft className="h-5 w-5 text-gray-400 group-hover:text-purple-600 transition-colors" />
-          <Sparkles className="h-7 w-7 text-purple-600" />
-          <span className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-            TokCash
-          </span>
+          <Image 
+            src="/images/logos/LogoTokCash.png" 
+            alt="TokCash" 
+            width={280} 
+            height={92}
+            className="h-24 w-auto group-hover:scale-105 transition-transform"
+          />
         </Link>
 
         <Card className="p-8 border-0 shadow-2xl shadow-gray-300/50 bg-white/80 backdrop-blur-xl">
