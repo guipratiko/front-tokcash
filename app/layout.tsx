@@ -8,6 +8,11 @@ const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
   title: 'TokCash - Geracao de Prompts e Videos Virais com IA',
   description: 'Plataforma para geracao de prompts de videos virais e videos prontos com IA',
+  icons: {
+    icon: '/images/logos/favicon.png',
+    shortcut: '/images/logos/favicon.png',
+    apple: '/images/logos/favicon.png',
+  },
 }
 
 export default function RootLayout({
