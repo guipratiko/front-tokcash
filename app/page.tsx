@@ -67,7 +67,8 @@ export default function LandingPage() {
       }`}>
         <div className="max-w-7xl mx-auto px-6 py-1">
           <div className="flex justify-between items-center">
-            <Link href="/" className="flex items-center">
+            {/* Logo - apenas desktop */}
+            <Link href="/" className="hidden md:flex items-center">
               <ContentWrapper 
                 {...(isMounted && {
                   whileHover: { scale: 1.05 }
@@ -76,14 +77,24 @@ export default function LandingPage() {
                 <Image 
                   src="/images/logos/LogoTokCash.png" 
                   alt="TokCash" 
-                  width={240} 
-                  height={80}
-                  className="h-20 w-auto"
+                  width={192} 
+                  height={64}
+                  className="h-16 w-auto"
                 />
               </ContentWrapper>
             </Link>
 
-            <div className="flex items-center gap-3">
+            {/* Mobile - Botão Entrar no lugar da logo */}
+            <div className="md:hidden">
+              <Link href="/auth/login">
+                <Button variant="ghost" className="text-gray-700">
+                  Entrar
+                </Button>
+              </Link>
+            </div>
+
+            {/* Desktop - Botões */}
+            <div className="hidden md:flex items-center gap-3">
               <Link href="/auth/login">
                 <Button variant="ghost" className="text-gray-700">
                   Entrar
@@ -91,7 +102,17 @@ export default function LandingPage() {
               </Link>
               <Link href="/auth/register">
                 <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg shadow-purple-500/30">
-                  Começar Grátis
+                  Começar Agora
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
+              </Link>
+            </div>
+
+            {/* Mobile - Botão Começar Agora */}
+            <div className="md:hidden">
+              <Link href="/auth/register">
+                <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg shadow-purple-500/30">
+                  Começar Agora
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
@@ -101,7 +122,21 @@ export default function LandingPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative z-10 max-w-7xl mx-auto px-6 pt-24 pb-16">
+      <section className="relative z-10 max-w-7xl mx-auto px-6 md:pt-24 pt-8 pb-16">
+        {/* Logo - apenas mobile (próxima do header) */}
+        <ContentWrapper 
+          {...(isMounted && { variants: itemVariants })}
+          className="md:hidden flex justify-center mb-12"
+        >
+          <Image 
+            src="/images/logos/LogoTokCash.png" 
+            alt="TokCash" 
+            width={312} 
+            height={103}
+            className="h-[125px] w-auto"
+          />
+        </ContentWrapper>
+
         <ContentWrapper
           {...(isMounted && {
             variants: containerVariants,
@@ -119,21 +154,22 @@ export default function LandingPage() {
 
           <ContentWrapper 
             {...(isMounted && { variants: itemVariants })}
-            className="text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight"
+            className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight"
           >
             <span className="bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 bg-clip-text text-transparent">
-              Vídeos Virais
+              Ganhe de R$120 a R$460 por dia
             </span>
             <br />
-            <span className="text-gray-900">em segundos</span>
+            <span className="text-gray-900">Apenas postando vídeos</span>
+            <br />
+            <span className="text-gray-900">No TikTok</span>
           </ContentWrapper>
 
           <ContentWrapper 
             {...(isMounted && { variants: itemVariants })}
             className="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed"
           >
-            Gere prompts otimizados e videos prontos com IA.<br />
-            <span className="font-semibold text-gray-900">De ideia a viral em minutos.</span>
+            <span className="font-semibold text-gray-900">Comece agora e transforme seu tempo em dinheiro.</span>
           </ContentWrapper>
 
           <ContentWrapper 
@@ -145,7 +181,7 @@ export default function LandingPage() {
                 size="lg" 
                 className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-lg px-8 py-6 rounded-2xl shadow-2xl shadow-purple-500/30 hover:shadow-purple-500/40 transition-all"
               >
-                Começar Agora - Grátis
+                Começar Agora
                 <Sparkles className="ml-2 h-5 w-5" />
               </Button>
             </Link>
@@ -415,7 +451,7 @@ export default function LandingPage() {
               size="lg" 
               className="bg-white text-purple-600 hover:bg-gray-50 text-lg px-8 py-6 rounded-2xl shadow-xl"
             >
-              Começar Grátis Agora
+              Começar Agora
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
           </Link>

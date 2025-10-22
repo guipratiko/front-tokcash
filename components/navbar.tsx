@@ -51,9 +51,9 @@ export function Navbar() {
             <Image 
               src="/images/logos/LogoTokCash.png" 
               alt="TokCash" 
-              width={240} 
-              height={80}
-              className="h-20 w-auto group-hover:scale-105 transition-transform"
+              width={192} 
+              height={64}
+              className="h-16 w-auto group-hover:scale-105 transition-transform"
             />
           </Link>
 
