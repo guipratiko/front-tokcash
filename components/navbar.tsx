@@ -32,7 +32,7 @@ export function Navbar() {
   const navItems = [
     { name: 'Dashboard', path: '/dashboard' },
     { name: 'Prompts', path: '/prompts' },
-    { name: 'Vídeos (Em breve)', path: '/videos', disabled: true },
+    { name: 'Vídeos', path: '/videos' },
     { name: 'Planos', path: '/buy-credits' },
   ]
 

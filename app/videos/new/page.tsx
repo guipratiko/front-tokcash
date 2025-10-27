@@ -1,30 +1,80 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useMutation, useQuery } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Navbar } from '@/components/navbar'
 import { Footer } from '@/components/footer'
-import { Video, Film, AlertCircle, Sparkles, ArrowRight } from 'lucide-react'
+import { Video, Copy, CheckCircle, Wand2, Loader2, AlertCircle, ExternalLink } from 'lucide-react'
 import { api } from '@/lib/api'
+
+// Helper para parsear a resposta e extrair informações
+function parseVideoResponse(resultText: string) {
+  try {
+    // Tenta parsear como JSON
+    const parsed = JSON.parse(resultText)
+    if (Array.isArray(parsed) && parsed[0]?.output) {
+      const output = parsed[0].output
+      
+      // Extrair link do markdown
+      const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g
+      const links: Array<{ text: string; url: string }> = []
+      let match
+      
+      while ((match = linkRegex.exec(output)) !== null) {
+        links.push({ text: match[1], url: match[2] })
+      }
+      
+      return {
+        formattedText: output,
+        links,
+        hasLinks: links.length > 0
+      }
+    }
+  } catch (e) {
+    // Se não for JSON válido, retorna o texto original
+    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g
+    const links: Array<{ text: string; url: string }> = []
+    let match
+    
+    while ((match = linkRegex.exec(resultText)) !== null) {
+      links.push({ text: match[1], url: match[2] })
+    }
+    
+    return {
+      formattedText: resultText,
+      links,
+      hasLinks: links.length > 0
+    }
+  }
+  
+  return {
+    formattedText: resultText,
+    links: [],
+    hasLinks: false
+  }
+}
 
 export default function NewVideoPage() {
   const router = useRouter()
-  const [selectedPromptId, setSelectedPromptId] = useState('')
-  const [textContent, setTextContent] = useState('')
-
-  const { data: promptsData } = useQuery({
-    queryKey: ['prompts'],
-    queryFn: async () => {
-      const result = await api.getPrompts()
-      return (result.data as any)?.prompts || []
-    },
+  const [copied, setCopied] = useState(false)
+  const [result, setResult] = useState<string | null>(null)
+  const [status, setStatus] = useState<'idle' | 'processing' | 'completed' | 'failed'>('idle')
+  const [videoId, setVideoId] = useState<string | null>(null)
+  const [formData, setFormData] = useState({
+    nicho: '',
+    objetivo: '',
+    cta: '',
+    duracao: '30s',
+    estilo: '',
+    persona: '',
   })
 
   const generateMutation = useMutation({
@@ -33,23 +83,55 @@ export default function NewVideoPage() {
       if (result.error) throw new Error(result.error)
       return result.data
     },
-    onSuccess: () => {
-      router.push('/videos')
+    onSuccess: (data: any) => {
+      const video = data?.video
+      if (video) {
+        setVideoId(video._id)
+        setStatus(video.status)
+        if (video.status === 'completed') {
+          setResult(video.resultText)
+        }
+      }
     },
   })
 
+  // Polling para verificar status do vídeo
+  useEffect(() => {
+    if (videoId && status === 'processing') {
+      const interval = setInterval(async () => {
+        try {
+          const result = await api.getVideo(videoId)
+          if (result.data?.video) {
+            const video = result.data.video
+            setStatus(video.status)
+            if (video.status === 'completed') {
+              setResult(video.resultText)
+              clearInterval(interval)
+            } else if (video.status === 'failed') {
+              setResult(video.resultText || 'Erro ao gerar vídeo. Tente novamente.')
+              clearInterval(interval)
+            }
+          }
+        } catch (error) {
+          console.error('Erro ao verificar status do vídeo:', error)
+        }
+      }, 3000) // Verifica a cada 3 segundos
+
+      return () => clearInterval(interval)
+    }
+  }, [videoId, status])
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+    generateMutation.mutate(formData)
+  }
 
-    const data: any = {}
-    if (selectedPromptId) {
-      data.promptId = selectedPromptId
+  const handleCopy = () => {
+    if (result) {
+      navigator.clipboard.writeText(result)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
     }
-    if (textContent) {
-      data.textContent = textContent
-    }
-
-    generateMutation.mutate(data)
   }
 
   return (
@@ -63,145 +145,249 @@ export default function NewVideoPage() {
       
       <Navbar />
 
-      <main className="max-w-4xl mx-auto px-6 py-8">
+      <main className="max-w-7xl mx-auto px-6 py-8">
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-3">
             <div className="p-2 bg-gradient-to-br from-pink-500 to-purple-600 rounded-xl">
               <Video className="h-6 w-6 text-white" />
             </div>
-            <h1 className="text-4xl font-bold text-gray-900">Gerar Vídeo com IA</h1>
+            <h1 className="text-4xl font-bold text-gray-900">Gerar Vídeo Viral</h1>
           </div>
           <div className="text-gray-600 flex items-center gap-2">
             <Badge className="bg-pink-100 text-pink-700 border-0">5 créditos</Badge>
-            Geração completa: roteiro, voz, legendas e vídeo
+            Preencha os campos e deixe a IA criar o vídeo perfeito
           </div>
         </div>
 
-        <Card className="p-8 border-0 shadow-2xl shadow-gray-300/50 bg-white">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Form */}
+          <Card className="p-6 border-0 shadow-xl shadow-gray-200/50 bg-white">
+            <h2 className="text-lg font-semibold text-gray-900 mb-6">Informações do Vídeo</h2>
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="nicho" className="text-gray-700 font-medium">
+                  Nicho / Tema *
+                </Label>
+                <Input
+                  id="nicho"
+                  placeholder="Ex: Finanças, Fitness, Tecnologia..."
+                  required
+                  value={formData.nicho}
+                  onChange={(e) => setFormData({ ...formData, nicho: e.target.value })}
+                  className="h-12 border-gray-300 focus:border-pink-500"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="objetivo" className="text-gray-700 font-medium">
+                  Objetivo do vídeo *
+                </Label>
+                <Textarea
+                  id="objetivo"
+                  placeholder="Ex: Ensinar a economizar 30% da renda mensal"
+                  required
+                  rows={3}
+                  value={formData.objetivo}
+                  onChange={(e) => setFormData({ ...formData, objetivo: e.target.value })}
+                  className="border-gray-300 focus:border-pink-500"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="cta" className="text-gray-700 font-medium">
+                  Call to Action
+                </Label>
+                <Input
+                  id="cta"
+                  placeholder="Ex: Salve este vídeo!"
+                  value={formData.cta}
+                  onChange={(e) => setFormData({ ...formData, cta: e.target.value })}
+                  className="h-12 border-gray-300 focus:border-pink-500"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="duracao" className="text-gray-700 font-medium">
+                    Duração
+                  </Label>
+                  <select
+                    id="duracao"
+                    value={formData.duracao}
+                    onChange={(e) => setFormData({ ...formData, duracao: e.target.value })}
+                    className="flex h-12 w-full rounded-xl border border-gray-300 bg-white px-3 text-sm focus:border-pink-500 focus:ring-2 focus:ring-pink-500"
+                  >
+                    <option value="15s">15 segundos</option>
+                    <option value="30s">30 segundos</option>
+                    <option value="60s">60 segundos</option>
+                  </select>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="estilo" className="text-gray-700 font-medium">
+                    Estilo
+                  </Label>
+                  <Input
+                    id="estilo"
+                    placeholder="Ex: Dinâmico..."
+                    value={formData.estilo}
+                    onChange={(e) => setFormData({ ...formData, estilo: e.target.value })}
+                    className="h-12 border-gray-300 focus:border-pink-500"
+                  />
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                disabled={generateMutation.isPending}
+                className="w-full h-12 bg-gradient-to-r from-pink-600 to-purple-600 hover:from-pink-700 hover:to-purple-700 text-white shadow-lg"
+              >
+                {generateMutation.isPending ? (
+                  <>Gerando...</>
+                ) : (
+                  <>
+                    <Wand2 className="h-5 w-5 mr-2" />
+                    Gerar Vídeo com IA
+                  </>
+                )}
+              </Button>
+            </form>
+          </Card>
+
+          {/* Result */}
+          <Card className="p-6 border-0 shadow-xl shadow-gray-200/50 bg-white">
+            <h2 className="text-lg font-semibold text-gray-900 mb-6">Resultado</h2>
+
             {generateMutation.error && (
+              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl text-sm mb-4">
+                {(generateMutation.error as Error).message}
+              </div>
+            )}
+
+            {status === 'processing' ? (
               <motion.div
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl flex items-start gap-2"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex flex-col items-center justify-center py-20 text-center"
               >
-                <AlertCircle className="h-5 w-5 flex-shrink-0 mt-0.5" />
-                <span>{(generateMutation.error as Error).message}</span>
+                <div className="relative">
+                  <div className="p-4 bg-gradient-to-br from-pink-100 to-purple-100 rounded-full mb-4">
+                    <Loader2 className="h-12 w-12 text-pink-600 animate-spin" />
+                  </div>
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Gerando vídeo com IA...
+                </h3>
+                <p className="text-gray-600 max-w-sm">
+                  Aguarde enquanto nossa IA cria o vídeo perfeito para você. Isso pode levar alguns minutos.
+                </p>
+                <div className="mt-4 flex items-center gap-2 text-sm text-pink-600">
+                  <div className="w-2 h-2 bg-pink-600 rounded-full animate-pulse"></div>
+                  <span>Processando...</span>
+                </div>
               </motion.div>
-            )}
-
-            <div className="space-y-3">
-              <Label htmlFor="prompt" className="text-gray-900 font-semibold text-lg">
-                Escolha um prompt existente
-              </Label>
-              <select
-                id="prompt"
-                value={selectedPromptId}
-                onChange={(e) => setSelectedPromptId(e.target.value)}
-                className="flex h-12 w-full rounded-xl border-2 border-gray-300 bg-white px-4 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+            ) : status === 'failed' ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="flex flex-col items-center justify-center py-20 text-center"
               >
-                <option value="">Selecione um prompt da sua biblioteca</option>
-                {promptsData?.map((prompt: any) => (
-                  <option key={prompt._id} value={prompt._id}>
-                    {prompt.inputBrief?.nicho || 'Prompt'} -{' '}
-                    {new Date(prompt.createdAt).toLocaleDateString('pt-BR')}
-                  </option>
-                ))}
-              </select>
-              <p className="text-sm text-gray-600">
-                Ou escreva um texto personalizado abaixo
-              </p>
-            </div>
-
-            <div className="relative">
-              <div className="absolute left-1/2 -translate-x-1/2 -top-3 z-10">
-                <Badge className="bg-gray-700 text-white border-0 px-3">OU</Badge>
-              </div>
-              <div className="border-t border-gray-300"></div>
-            </div>
-
-            <div className="space-y-3">
-              <Label htmlFor="text" className="text-gray-900 font-semibold text-lg">
-                Texto personalizado
-              </Label>
-              <Textarea
-                id="text"
-                placeholder="Escreva o roteiro do seu vídeo aqui..."
-                rows={6}
-                value={textContent}
-                onChange={(e) => setTextContent(e.target.value)}
-                className="border-2 border-gray-300 focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
-              />
-            </div>
-
-            <Card className="p-6 bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-200">
-              <div className="flex items-start gap-3 mb-4">
-                <div className="p-2 bg-blue-600 rounded-lg">
-                  <Film className="h-5 w-5 text-white" />
+                <div className="p-4 bg-red-100 rounded-full mb-4">
+                  <AlertCircle className="h-12 w-12 text-red-600" />
                 </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Pipeline de Geração</h3>
-                  <p className="text-sm text-gray-600">IA trabalhará em várias etapas</p>
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  Erro ao gerar vídeo
+                </h3>
+                <p className="text-gray-600 max-w-sm mb-4">
+                  {result || 'Não foi possível gerar o vídeo. Tente novamente.'}
+                </p>
+                <Button
+                  onClick={() => {
+                    setStatus('idle')
+                    setResult(null)
+                    setVideoId(null)
+                  }}
+                  className="bg-pink-600 hover:bg-pink-700 text-white"
+                >
+                  Tentar Novamente
+                </Button>
+              </motion.div>
+            ) : result && status === 'completed' ? (
+              (() => {
+                const parsed = parseVideoResponse(result)
+                // Remove links markdown do texto
+                const cleanText = parsed.formattedText.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '')
+                
+                return (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="space-y-4"
+                  >
+                    <div className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-xl p-6 border border-pink-100">
+                      <pre className="text-sm text-gray-800 whitespace-pre-wrap font-sans leading-relaxed">
+                        {cleanText.trim()}
+                      </pre>
+                    </div>
+                    
+                    {parsed.hasLinks && (
+                      <div className="flex flex-wrap gap-2">
+                        {parsed.links.map((link, idx) => (
+                          <Button
+                            key={idx}
+                            variant="outline"
+                            asChild
+                            className="border-2 border-pink-300 hover:border-pink-400 hover:bg-pink-50 text-pink-700"
+                          >
+                            <a href={link.url} target="_blank" rel="noopener noreferrer">
+                              <ExternalLink className="h-4 w-4 mr-2" />
+                              {link.text}
+                            </a>
+                          </Button>
+                        ))}
+                      </div>
+                    )}
+
+                    <div className="flex gap-3">
+                      <Button
+                        variant="outline"
+                        onClick={handleCopy}
+                        className="flex-1 border-2 border-gray-300 hover:border-pink-400 hover:bg-pink-50"
+                      >
+                        {copied ? (
+                          <>
+                            <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
+                            Copiado!
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="h-4 w-4 mr-2" />
+                            Copiar
+                          </>
+                        )}
+                      </Button>
+                      <Button
+                        onClick={() => router.push('/videos')}
+                        className="flex-1 bg-pink-600 hover:bg-pink-700 text-white"
+                      >
+                        Ver Todos
+                      </Button>
+                    </div>
+                  </motion.div>
+                )
+              })()
+            ) : (
+              <div className="flex flex-col items-center justify-center py-20 text-center">
+                <div className="p-4 bg-gray-100 rounded-full mb-4">
+                  <Video className="h-12 w-12 text-gray-400" />
                 </div>
+                <p className="text-gray-600">
+                  Preencha o formulário e clique em gerar
+                </p>
               </div>
-
-              <ol className="space-y-2 text-sm text-gray-700 ml-11">
-                <li className="flex items-center gap-2">
-                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-white flex items-center justify-center text-xs font-semibold text-blue-600">
-                    1
-                  </span>
-                  Análise do roteiro
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-white flex items-center justify-center text-xs font-semibold text-blue-600">
-                    2
-                  </span>
-                  Síntese de voz (TTS)
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-white flex items-center justify-center text-xs font-semibold text-blue-600">
-                    3
-                  </span>
-                  Geração de legendas
-                </li>
-                <li className="flex items-center gap-2">
-                  <span className="flex-shrink-0 w-6 h-6 rounded-full bg-white flex items-center justify-center text-xs font-semibold text-blue-600">
-                    4
-                  </span>
-                  Renderização final
-                </li>
-              </ol>
-
-              <div className="mt-4 pt-4 border-t border-blue-200">
-                <div className="text-xs text-gray-600 flex items-center gap-2">
-                  <Sparkles className="h-4 w-4 text-blue-600" />
-                  Tempo estimado: 5-10 minutos
-                </div>
-              </div>
-            </Card>
-
-            <Button
-              type="submit"
-              disabled={generateMutation.isPending || (!selectedPromptId && !textContent)}
-              className="w-full h-14 text-lg bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-xl"
-            >
-              {generateMutation.isPending ? (
-                'Iniciando geração...'
-              ) : (
-                <>
-                  Gerar Vídeo com IA (5 créditos)
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </>
-              )}
-            </Button>
-
-            {(!selectedPromptId && !textContent) && (
-              <p className="text-center text-sm text-gray-500">
-                Selecione um prompt ou escreva um texto para continuar
-              </p>
             )}
-          </form>
-        </Card>
+          </Card>
+        </div>
       </main>
 
       {/* Footer */}
@@ -226,3 +412,4 @@ export default function NewVideoPage() {
     </div>
   )
 }
+

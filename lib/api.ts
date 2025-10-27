@@ -16,7 +16,7 @@ const getApiUrl = () => {
   }
   
   // Desenvolvimento (padrão)
-  return 'http://localhost:4000/api';
+  return 'http://localhost:4800/api';
 };
 
 const API_URL = getApiUrl();
@@ -106,6 +106,10 @@ export const api = {
   getVideos: () => fetcher('/videos'),
   
   getVideo: (id: string) => fetcher(`/videos/${id}`),
+  
+  deleteVideo: (id: string) => fetcher(`/videos/${id}`, {
+    method: 'DELETE',
+  }),
 
   // Trends
   getTrends: () => fetcher('/trends'),

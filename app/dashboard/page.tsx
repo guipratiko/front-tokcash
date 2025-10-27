@@ -164,14 +164,13 @@ export default function DashboardPage() {
                   </Button>
                 </Link>
                 
-                <Button 
-                  disabled
-                  className="w-full h-full min-h-[80px] flex flex-col gap-2 bg-gradient-to-br from-gray-400 to-gray-500 text-white shadow-lg cursor-not-allowed opacity-60"
-                >
-                  <Video className="h-6 w-6" />
-                  <span className="font-semibold">Gerar Vídeo</span>
-                  <span className="text-xs opacity-90">Em Desenvolvimento</span>
-                </Button>
+                <Link href="/videos/new" className="block">
+                  <Button className="w-full h-full min-h-[80px] flex flex-col gap-2 bg-gradient-to-br from-pink-500 to-pink-600 hover:from-pink-600 hover:to-pink-700 text-white shadow-lg">
+                    <Video className="h-6 w-6" />
+                    <span className="font-semibold">Gerar Vídeo</span>
+                    <span className="text-xs opacity-90">5 créditos</span>
+                  </Button>
+                </Link>
               </div>
             </Card>
           </ContentWrapper>
@@ -207,18 +206,18 @@ export default function DashboardPage() {
               transition: { delay: 0.4 }
             })}
           >
-            <Card className="p-6 border-0 shadow-lg bg-white opacity-60 cursor-not-allowed">
-              <div className="flex items-center justify-between mb-4">
-                <div className="p-3 bg-gray-100 rounded-2xl">
-                  <Video className="h-6 w-6 text-gray-400" />
+            <Link href="/videos">
+              <Card className="p-6 border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white group cursor-pointer">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="p-3 bg-pink-100 rounded-2xl group-hover:bg-pink-200 transition-colors">
+                    <Video className="h-6 w-6 text-pink-600" />
+                  </div>
+                  <ArrowRight className="h-5 w-5 text-gray-400 group-hover:text-pink-600 group-hover:translate-x-1 transition-all" />
                 </div>
-                <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
-                  Em breve
-                </span>
-              </div>
-              <h3 className="text-lg font-semibold text-gray-500 mb-1">Meus Vídeos</h3>
-              <p className="text-sm text-gray-400">Em Desenvolvimento</p>
-            </Card>
+                <h3 className="text-lg font-semibold text-gray-900 mb-1">Meus Vídeos</h3>
+                <p className="text-sm text-gray-600">Ver todos os vídeos gerados</p>
+              </Card>
+            </Link>
           </ContentWrapper>
 
           <ContentWrapper
