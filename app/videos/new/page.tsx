@@ -17,48 +17,64 @@ import { api } from '@/lib/api'
 
 // Helper para parsear a resposta e extrair informações
 function parseVideoResponse(resultText: string) {
+  // Extrair links diretos (http/https)
+  const urlRegex = /(https?:\/\/[^\s]+)/g
+  
+  // Extrair links markdown
+  const markdownLinkRegex = /\[([^\]]+)\]\(([^)]+)\)/g
+  
+  const links: Array<{ text: string; url: string }> = []
+  
+  // Primeiro, tenta parsear como JSON
   try {
-    // Tenta parsear como JSON
     const parsed = JSON.parse(resultText)
     if (Array.isArray(parsed) && parsed[0]?.output) {
       const output = parsed[0].output
       
-      // Extrair link do markdown
-      const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g
-      const links: Array<{ text: string; url: string }> = []
+      // Extrair links markdown
       let match
-      
-      while ((match = linkRegex.exec(output)) !== null) {
+      while ((match = markdownLinkRegex.exec(output)) !== null) {
         links.push({ text: match[1], url: match[2] })
+      }
+      
+      // Extrair URLs diretas (se não houver markdown)
+      if (links.length === 0) {
+        while ((match = urlRegex.exec(output)) !== null) {
+          const url = match[1]
+          links.push({ text: 'Assistir Vídeo', url })
+        }
       }
       
       return {
         formattedText: output,
         links,
-        hasLinks: links.length > 0
+        hasLinks: links.length > 0,
+        isDirectLink: links.length === 1 && output.trim().startsWith('http')
       }
     }
   } catch (e) {
-    // Se não for JSON válido, retorna o texto original
-    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g
-    const links: Array<{ text: string; url: string }> = []
-    let match
-    
-    while ((match = linkRegex.exec(resultText)) !== null) {
-      links.push({ text: match[1], url: match[2] })
-    }
-    
-    return {
-      formattedText: resultText,
-      links,
-      hasLinks: links.length > 0
+    // Não é JSON válido
+  }
+  
+  // Extrair links do texto original
+  let match
+  while ((match = markdownLinkRegex.exec(resultText)) !== null) {
+    links.push({ text: match[1], url: match[2] })
+  }
+  
+  // Se não tiver markdown, buscar URLs diretas
+  if (links.length === 0) {
+    while ((match = urlRegex.exec(resultText)) !== null) {
+      const url = match[1]
+      links.push({ text: 'Assistir Vídeo', url })
     }
   }
   
   return {
     formattedText: resultText,
-    links: [],
-    hasLinks: false
+    links,
+    hasLinks: links.length > 0,
+    isDirectLink: links.length === 1 && resultText.trim().startsWith('http')
   }
 }
 
@@ -128,7 +144,10 @@ export default function NewVideoPage() {
 
   const handleCopy = () => {
     if (result) {
-      navigator.clipboard.writeText(result)
+      const parsed = parseVideoResponse(result)
+      // Se houver link, copiar o link. Senão, copiar o texto completo
+      const textToCopy = parsed.hasLinks ? parsed.links[0]?.url || result : result
+      navigator.clipboard.writeText(textToCopy)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     }
@@ -315,8 +334,67 @@ export default function NewVideoPage() {
             ) : result && status === 'completed' ? (
               (() => {
                 const parsed = parseVideoResponse(result)
-                // Remove links markdown do texto
-                const cleanText = parsed.formattedText.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '')
+                
+                // Se for apenas um link direto, mostrar só o botão grande e bonito
+                if (parsed.isDirectLink) {
+                  return (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="space-y-6"
+                    >
+                      <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 border-2 border-green-200 text-center">
+                        <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
+                        <h3 className="text-xl font-bold text-gray-900 mb-2">Vídeo Gerado com Sucesso!</h3>
+                        <p className="text-gray-600 mb-6">Seu vídeo está pronto para ser assistido</p>
+                        
+                        <Button
+                          size="lg"
+                          className="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-xl"
+                          asChild
+                        >
+                          <a href={parsed.links[0]?.url} target="_blank" rel="noopener noreferrer">
+                            <Video className="h-6 w-6 mr-3" />
+                            Assistir Vídeo
+                            <ExternalLink className="h-5 w-5 ml-3" />
+                          </a>
+                        </Button>
+                      </div>
+
+                      <div className="flex gap-3">
+                        <Button
+                          variant="outline"
+                          onClick={handleCopy}
+                          className="flex-1 border-2 border-gray-300 hover:border-pink-400 hover:bg-pink-50"
+                        >
+                          {copied ? (
+                            <>
+                              <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
+                              Copiado!
+                            </>
+                          ) : (
+                            <>
+                              <Copy className="h-4 w-4 mr-2" />
+                              Copiar Link
+                            </>
+                          )}
+                        </Button>
+                        <Button
+                          onClick={() => router.push('/videos')}
+                          className="flex-1 bg-pink-600 hover:bg-pink-700 text-white"
+                        >
+                          Ver Todos
+                        </Button>
+                      </div>
+                    </motion.div>
+                  )
+                }
+                
+                // Remove links markdown e URLs do texto
+                const cleanText = parsed.formattedText
+                  .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '')
+                  .replace(/(https?:\/\/[^\s]+)/g, '')
+                  .trim()
                 
                 return (
                   <motion.div
@@ -324,11 +402,13 @@ export default function NewVideoPage() {
                     animate={{ opacity: 1, scale: 1 }}
                     className="space-y-4"
                   >
-                    <div className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-xl p-6 border border-pink-100">
-                      <pre className="text-sm text-gray-800 whitespace-pre-wrap font-sans leading-relaxed">
-                        {cleanText.trim()}
-                      </pre>
-                    </div>
+                    {cleanText && (
+                      <div className="bg-gradient-to-br from-pink-50 to-purple-50 rounded-xl p-6 border border-pink-100">
+                        <pre className="text-sm text-gray-800 whitespace-pre-wrap font-sans leading-relaxed">
+                          {cleanText}
+                        </pre>
+                      </div>
+                    )}
                     
                     {parsed.hasLinks && (
                       <div className="flex flex-wrap gap-2">

@@ -14,48 +14,64 @@ import { useState } from 'react'
 
 // Helper para parsear a resposta e extrair informações
 function parseVideoResponse(resultText: string) {
+  // Extrair links diretos (http/https)
+  const urlRegex = /(https?:\/\/[^\s]+)/g
+  
+  // Extrair links markdown
+  const markdownLinkRegex = /\[([^\]]+)\]\(([^)]+)\)/g
+  
+  const links: Array<{ text: string; url: string }> = []
+  
+  // Primeiro, tenta parsear como JSON
   try {
-    // Tenta parsear como JSON
     const parsed = JSON.parse(resultText)
     if (Array.isArray(parsed) && parsed[0]?.output) {
       const output = parsed[0].output
       
-      // Extrair link do markdown
-      const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g
-      const links: Array<{ text: string; url: string }> = []
+      // Extrair links markdown
       let match
-      
-      while ((match = linkRegex.exec(output)) !== null) {
+      while ((match = markdownLinkRegex.exec(output)) !== null) {
         links.push({ text: match[1], url: match[2] })
+      }
+      
+      // Extrair URLs diretas (se não houver markdown)
+      if (links.length === 0) {
+        while ((match = urlRegex.exec(output)) !== null) {
+          const url = match[1]
+          links.push({ text: 'Assistir Vídeo', url })
+        }
       }
       
       return {
         formattedText: output,
         links,
-        hasLinks: links.length > 0
+        hasLinks: links.length > 0,
+        isDirectLink: links.length === 1 && output.trim().startsWith('http')
       }
     }
   } catch (e) {
-    // Se não for JSON válido, retorna o texto original
-    const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g
-    const links: Array<{ text: string; url: string }> = []
-    let match
-    
-    while ((match = linkRegex.exec(resultText)) !== null) {
-      links.push({ text: match[1], url: match[2] })
-    }
-    
-    return {
-      formattedText: resultText,
-      links,
-      hasLinks: links.length > 0
+    // Não é JSON válido
+  }
+  
+  // Extrair links do texto original
+  let match
+  while ((match = markdownLinkRegex.exec(resultText)) !== null) {
+    links.push({ text: match[1], url: match[2] })
+  }
+  
+  // Se não tiver markdown, buscar URLs diretas
+  if (links.length === 0) {
+    while ((match = urlRegex.exec(resultText)) !== null) {
+      const url = match[1]
+      links.push({ text: 'Assistir Vídeo', url })
     }
   }
   
   return {
     formattedText: resultText,
-    links: [],
-    hasLinks: false
+    links,
+    hasLinks: links.length > 0,
+    isDirectLink: links.length === 1 && resultText.trim().startsWith('http')
   }
 }
 
@@ -268,16 +284,40 @@ export default function VideosPage() {
                   ) : (
                     (() => {
                       const parsed = parseVideoResponse(video.resultText || '')
+                      
+                      // Se for apenas um link direto, mostrar só o botão
+                      if (parsed.isDirectLink) {
+                        return (
+                          <div className="mb-4">
+                            <Button
+                              size="lg"
+                              className="w-full bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white shadow-lg"
+                              asChild
+                            >
+                              <a href={parsed.links[0]?.url} target="_blank" rel="noopener noreferrer">
+                                <ExternalLink className="h-5 w-5 mr-2" />
+                                {parsed.links[0]?.text || 'Assistir Vídeo'}
+                              </a>
+                            </Button>
+                          </div>
+                        )
+                      }
+                      
                       // Remove links markdown do texto
-                      const cleanText = parsed.formattedText.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '')
+                      const cleanText = parsed.formattedText
+                        .replace(/\[([^\]]+)\]\(([^)]+)\)/g, '')
+                        .replace(/(https?:\/\/[^\s]+)/g, '')
+                        .trim()
                       
                       return (
                         <div className="space-y-4 mb-4">
-                          <div className="bg-gradient-to-br from-gray-50 to-pink-50/30 rounded-xl p-4 max-h-40 overflow-y-auto border border-gray-100">
-                            <pre className="text-sm text-gray-700 whitespace-pre-wrap font-sans">
-                              {cleanText.trim()}
-                            </pre>
-                          </div>
+                          {cleanText && (
+                            <div className="bg-gradient-to-br from-gray-50 to-pink-50/30 rounded-xl p-4 max-h-40 overflow-y-auto border border-gray-100">
+                              <pre className="text-sm text-gray-700 whitespace-pre-wrap font-sans">
+                                {cleanText}
+                              </pre>
+                            </div>
+                          )}
                           
                           {parsed.hasLinks && (
                             <div className="flex flex-wrap gap-2">
