@@ -8,11 +8,27 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Footer } from '@/components/footer'
-import { Sparkles, Video, TrendingUp, Zap, ArrowRight, CheckCircle, Star } from 'lucide-react'
+import { Sparkles, Video, TrendingUp, Zap, ArrowRight, CheckCircle, Star, Coins, Crown } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import { api } from '@/lib/api'
 
 export default function LandingPage() {
   const [isMounted, setIsMounted] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  
+  const { data: plansData } = useQuery({
+    queryKey: ['plans'],
+    queryFn: async () => {
+      const result = await api.getPlans()
+      return (result.data as any) || []
+    },
+  })
+
+  const planIcons = {
+    START: { icon: Zap, color: 'from-green-500 to-emerald-600' },
+    PRO: { icon: Star, color: 'from-purple-500 to-pink-600' },
+    INFINITY: { icon: Crown, color: 'from-red-500 to-pink-600' }
+  }
   
   useEffect(() => {
     setIsMounted(true)
@@ -301,132 +317,94 @@ export default function LandingPage() {
         </ContentWrapper>
 
         <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
-          {/* START */}
-          <ContentWrapper
-            {...(isMounted && {
-              initial: { opacity: 0, y: 30 },
-              whileInView: { opacity: 1, y: 0 },
-              viewport: { once: true },
-              whileHover: { y: -8, scale: 1.02 },
-              transition: { duration: 0.3 }
-            })}
-          >
-            <Card className="p-8 border-2 border-gray-200 hover:border-purple-300 shadow-xl hover:shadow-2xl transition-all duration-300 bg-white">
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">START</h3>
-                <div className="flex items-baseline justify-center gap-1 mb-4">
-                  <span className="text-5xl font-bold text-gray-900">R$97</span>
-                  <span className="text-xl text-gray-600">/mês</span>
-                </div>
-                <Badge className="bg-green-100 text-green-700 border-0">
-                  15 créditos/mês
-                </Badge>
-              </div>
+          {plansData?.map((plan: any, i: number) => {
+            const config = planIcons[plan.code as keyof typeof planIcons]
+            const Icon = config.icon
+            const isPopular = plan.code === 'PRO'
 
-              <ul className="space-y-4 mb-8">
-                {['Geração de prompts', 'Trends semanais', 'Templates virais', 'Suporte básico'].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-gray-700">
-                    <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
+            return (
+              <ContentWrapper
+                key={plan.code}
+                {...(isMounted && {
+                  initial: { opacity: 0, y: 30 },
+                  whileInView: { opacity: 1, y: 0 },
+                  viewport: { once: true },
+                  whileHover: { y: isPopular ? -12 : -8, scale: isPopular ? 1.03 : 1.02 },
+                  transition: { duration: 0.3 }
+                })}
+                className={isPopular ? 'relative' : ''}
+              >
+                {isPopular && (
+                  <div className="absolute -top-5 left-1/2 -translate-x-1/2 z-10">
+                    <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0 px-4 py-1.5 text-sm font-semibold shadow-lg">
+                      <Star className="h-3 w-3 mr-1 inline" />
+                      MAIS POPULAR
+                    </Badge>
+                  </div>
+                )}
 
-              <Link href="/auth/register" className="block">
-                <Button className="w-full bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white py-6 rounded-xl shadow-lg">
-                  Começar Agora
-                </Button>
-              </Link>
-            </Card>
-          </ContentWrapper>
+                <Card className={`p-8 border-2 ${
+                  isPopular 
+                    ? 'border-purple-400 shadow-2xl bg-gradient-to-b from-white to-purple-50' 
+                    : 'border-gray-200 hover:border-purple-300 shadow-xl hover:shadow-2xl'
+                } transition-all duration-300 bg-white`}>
+                  <div className="text-center mb-8">
+                    <div className="flex justify-center mb-4">
+                      <div className={`p-3 bg-gradient-to-br ${config.color} rounded-2xl shadow-lg`}>
+                        <Icon className="h-8 w-8 text-white" />
+                      </div>
+                    </div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
+                    <div className="flex items-baseline justify-center gap-1 mb-4">
+                      <span className={`text-5xl font-bold ${isPopular ? 'bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent' : 'text-gray-900'}`}>
+                        R${plan.priceBRL}
+                      </span>
+                      <span className="text-xl text-gray-600">/mês</span>
+                    </div>
+                    <Badge className={`${
+                      plan.code === 'START' ? 'bg-green-100 text-green-700' :
+                      plan.code === 'PRO' ? 'bg-purple-100 text-purple-700' :
+                      'bg-red-100 text-red-700'
+                    } border-0`}>
+                      {plan.credits} créditos/mês
+                    </Badge>
+                    {plan.description && (
+                      <p className="text-center text-gray-600 text-sm mt-3">
+                        {plan.description}
+                      </p>
+                    )}
+                  </div>
 
-          {/* PRO - Destaque */}
-          <ContentWrapper
-            {...(isMounted && {
-              initial: { opacity: 0, y: 30 },
-              whileInView: { opacity: 1, y: 0 },
-              viewport: { once: true },
-              whileHover: { y: -12, scale: 1.03 },
-              transition: { duration: 0.3 }
-            })}
-            className="relative"
-          >
-            <div className="absolute -top-5 left-1/2 -translate-x-1/2 z-10">
-              <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0 px-4 py-1.5 text-sm font-semibold shadow-lg">
-                <Star className="h-3 w-3 mr-1 inline" />
-                MAIS POPULAR
-              </Badge>
-            </div>
+                  <ul className="space-y-4 mb-8">
+                    {plan.features?.map((feature: string, idx: number) => (
+                      <li key={idx} className="flex items-center gap-3 text-gray-700">
+                        <CheckCircle className={`h-5 w-5 flex-shrink-0 ${
+                          plan.code === 'START' ? 'text-green-600' :
+                          plan.code === 'PRO' ? 'text-purple-600' :
+                          'text-red-600'
+                        }`} />
+                        <span className={idx === 0 ? 'font-semibold' : ''}>{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
 
-            <Card className="p-8 border-2 border-purple-400 shadow-2xl bg-gradient-to-b from-white to-purple-50 relative">
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">PRO</h3>
-                <div className="flex items-baseline justify-center gap-1 mb-4">
-                  <span className="text-5xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
-                    R$197
-                  </span>
-                  <span className="text-xl text-gray-600">/mês</span>
-                </div>
-                <Badge className="bg-purple-100 text-purple-700 border-0">
-                  30 créditos/mês
-                </Badge>
-              </div>
+                  <Link href="/auth/register" className="block">
+                    <Button className={`w-full bg-gradient-to-r ${
+                      plan.code === 'START' ? 'from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700' :
+                      plan.code === 'PRO' ? 'from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-xl shadow-purple-500/30' :
+                      'from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700'
+                    } text-white py-6 rounded-xl shadow-lg`}>
+                      {plan.code === 'INFINITY' ? 'Escalar Agora' : `Começar ${plan.name}`}
+                    </Button>
+                  </Link>
 
-              <ul className="space-y-4 mb-8">
-                {['Tudo do START +', 'Vídeos prontos com IA', 'Edição automática', 'Relatórios de performance', 'Suporte prioritário'].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-gray-700">
-                    <CheckCircle className="h-5 w-5 text-purple-600 flex-shrink-0" />
-                    <span className={i === 0 ? 'font-semibold' : ''}>{item}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <Link href="/auth/register" className="block">
-                <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-6 rounded-xl shadow-xl shadow-purple-500/30">
-                  Começar com PRO
-                </Button>
-              </Link>
-            </Card>
-          </ContentWrapper>
-
-          {/* INFINITY */}
-          <ContentWrapper
-            {...(isMounted && {
-              initial: { opacity: 0, y: 30 },
-              whileInView: { opacity: 1, y: 0 },
-              viewport: { once: true },
-              whileHover: { y: -8, scale: 1.02 },
-              transition: { duration: 0.3 }
-            })}
-          >
-            <Card className="p-8 border-2 border-gray-200 hover:border-pink-300 shadow-xl hover:shadow-2xl transition-all duration-300 bg-white">
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">INFINITY</h3>
-                <div className="flex items-baseline justify-center gap-1 mb-4">
-                  <span className="text-5xl font-bold text-gray-900">R$497</span>
-                  <span className="text-xl text-gray-600">/mês</span>
-                </div>
-                <Badge className="bg-red-100 text-red-700 border-0">
-                  100 créditos/mês
-                </Badge>
-              </div>
-
-              <ul className="space-y-4 mb-8">
-                {['Tudo do PRO +', 'Consultoria exclusiva', 'Acesso antecipado', 'API personalizada', 'Suporte VIP 24/7'].map((item, i) => (
-                  <li key={i} className="flex items-center gap-3 text-gray-700">
-                    <CheckCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
-                    <span className={i === 0 ? 'font-semibold' : ''}>{item}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <Link href="/auth/register" className="block">
-                <Button className="w-full bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700 text-white py-6 rounded-xl shadow-lg">
-                  Escalar Agora
-                </Button>
-              </Link>
-            </Card>
-          </ContentWrapper>
+                  <p className="text-center text-xs text-gray-500 mt-3">
+                    R$ {(plan.priceBRL / plan.credits).toFixed(2)} por crédito
+                  </p>
+                </Card>
+              </ContentWrapper>
+            )
+          })}
         </div>
       </section>
 
