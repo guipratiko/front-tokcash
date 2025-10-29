@@ -137,7 +137,7 @@ export default function DashboardPage() {
                 <Link href="/buy-credits">
                   <Button variant="ghost" className="w-full text-white hover:bg-white/20 justify-start">
                     <Coins className="h-4 w-4 mr-2" />
-                    Assinar Plano Mensal
+                    Comprar Créditos
                   </Button>
                 </Link>
               </div>
