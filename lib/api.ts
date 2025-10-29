@@ -69,6 +69,11 @@ export const api = {
   me: () => fetcher('/auth/me'),
   
   refresh: () => fetcher('/auth/refresh', { method: 'POST' }),
+  
+  setPassword: (data: any) => fetcher('/auth/set-password', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }),
 
   // Plans
   getPlans: () => fetcher('/plans'),
