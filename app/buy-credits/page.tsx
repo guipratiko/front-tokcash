@@ -1,39 +1,16 @@
 'use client'
 
-import { useQuery, useMutation } from '@tanstack/react-query'
-import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Navbar } from '@/components/navbar'
 import { Footer } from '@/components/footer'
-import { 
-  Coins, 
-  Sparkles, 
-  Video, 
-  CheckCircle, 
-  Star,
-  Zap,
-  TrendingUp,
-  Crown,
-  Shield,
-  Rocket
-} from 'lucide-react'
+import { Coins, Sparkles, Video, CheckCircle, Zap, Shield, Rocket } from 'lucide-react'
 import { api } from '@/lib/api'
 
 export default function BuyCreditsPage() {
-  const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-
-  const { data: plansData } = useQuery({
-    queryKey: ['plans'],
-    queryFn: async () => {
-      const result = await api.getPlans()
-      return (result.data as any) || []
-    },
-  })
-
   const { data: balanceData } = useQuery({
     queryKey: ['credits', 'balance'],
     queryFn: async () => {
@@ -41,36 +18,6 @@ export default function BuyCreditsPage() {
       return (result.data as any)?.balance || 0
     },
   })
-
-  const createOrderMutation = useMutation({
-    mutationFn: async (planCode: string) => {
-      const result = await api.createOrder(planCode)
-      if (result.error) throw new Error(result.error)
-      return result.data
-    },
-    onSuccess: (data: any) => {
-      // Em produção, redirecionar para checkout
-      alert(`Pedido criado! ID: ${data?.order?.id}\n\nEm produção, você seria redirecionado para: ${data?.checkoutUrl}`)
-      setLoading(false)
-      setSelectedPlan(null)
-    },
-    onError: (error: any) => {
-      alert(`Erro: ${error.message}`)
-      setLoading(false)
-    }
-  })
-
-  const handleBuyPlan = (planCode: string) => {
-    setSelectedPlan(planCode)
-    setLoading(true)
-    createOrderMutation.mutate(planCode)
-  }
-
-  const planIcons = {
-    START: { icon: Zap, color: 'from-green-500 to-emerald-600', bg: 'bg-green-50' },
-    PRO: { icon: Star, color: 'from-yellow-500 to-orange-600', bg: 'bg-yellow-50' },
-    INFINITY: { icon: Crown, color: 'from-red-500 to-pink-600', bg: 'bg-red-50' }
-  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-white via-purple-50/40 to-white relative">
@@ -94,10 +41,10 @@ export default function BuyCreditsPage() {
             <Coins className="h-8 w-8 text-white" />
           </div>
           <h1 className="text-5xl font-bold text-gray-900 mb-4">
-            Assinar Plano Mensal
+            Comprar Créditos
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Receba créditos todos os meses e crie conteúdo viral sem parar
+            Adicione créditos à sua conta e crie conteúdo viral sem limites
           </p>
         </motion.div>
 
@@ -122,95 +69,79 @@ export default function BuyCreditsPage() {
           </Card>
         </motion.div>
 
-        {/* Plans Grid */}
-        <div className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto mb-12">
-          {plansData?.map((plan: any, i: number) => {
-            const config = planIcons[plan.code as keyof typeof planIcons]
-            const Icon = config.icon
-            const isPopular = plan.code === 'PRO'
+        {/* Single Plan Card */}
+        <div className="max-w-md mx-auto mb-12">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            whileHover={{ y: -8, scale: 1.02 }}
+            className="relative"
+          >
+            <Card className="p-8 border-0 shadow-2xl hover:shadow-3xl transition-all duration-300 bg-gradient-to-br from-purple-50 to-pink-50">
+              {/* Icon */}
+              <div className="flex justify-center mb-6">
+                <div className="p-4 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl shadow-lg">
+                  <Zap className="h-10 w-10 text-white" />
+                </div>
+              </div>
 
-            return (
-              <motion.div
-                key={plan.code}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.1 + 0.2 }}
-                whileHover={{ y: -8, scale: 1.02 }}
-                className="relative"
+              {/* Plan Name */}
+              <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">
+                Plano Único
+              </h3>
+
+              {/* Price */}
+              <div className="text-center mb-4">
+                <div className="flex items-baseline justify-center gap-1">
+                  <span className="text-xl text-gray-600">R$</span>
+                  <span className="text-5xl font-bold text-gray-900">97</span>
+                  <span className="text-xl text-gray-600">/mês</span>
+                </div>
+                <Badge className="mt-3 bg-purple-100 border-0 text-gray-700">
+                  15 créditos
+                </Badge>
+              </div>
+
+              {/* Description */}
+              <p className="text-center text-gray-600 text-sm mb-6">
+                O plano ideal para começar a criar conteúdo viral
+              </p>
+
+              {/* Features */}
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-start gap-2 text-sm text-gray-700">
+                  <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>Geração de prompts com IA</span>
+                </li>
+                <li className="flex items-start gap-2 text-sm text-gray-700">
+                  <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>Geração de vídeos com IA</span>
+                </li>
+                <li className="flex items-start gap-2 text-sm text-gray-700">
+                  <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>Acesso a trends semanais</span>
+                </li>
+                <li className="flex items-start gap-2 text-sm text-gray-700">
+                  <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>Suporte por email</span>
+                </li>
+              </ul>
+
+              {/* CTA Button */}
+              <Button
+                onClick={() => window.location.href = 'https://checkout.perfectpay.com.br/pay/PPU38CQ2L0K'}
+                className="w-full h-14 text-lg bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white shadow-xl font-semibold"
               >
-                {isPopular && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-10">
-                    <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white border-0 px-4 py-1.5 shadow-lg">
-                      <Star className="h-3 w-3 mr-1 inline" />
-                      MAIS POPULAR
-                    </Badge>
-                  </div>
-                )}
+                Comprar Agora
+                <Sparkles className="ml-2 h-5 w-5" />
+              </Button>
 
-                <Card className={`p-8 border-0 shadow-xl hover:shadow-2xl transition-all duration-300 ${config.bg} ${isPopular ? 'scale-105 border-2 border-yellow-400' : ''}`}>
-                  {/* Icon */}
-                  <div className="flex justify-center mb-6">
-                    <div className={`p-4 bg-gradient-to-br ${config.color} rounded-2xl shadow-lg`}>
-                      <Icon className="h-10 w-10 text-white" />
-                    </div>
-                  </div>
-
-                  {/* Plan Name */}
-                  <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">
-                    {plan.name}
-                  </h3>
-
-                  {/* Price */}
-                  <div className="text-center mb-4">
-                    <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-xl text-gray-600">R$</span>
-                      <span className="text-5xl font-bold text-gray-900">{plan.priceBRL}</span>
-                      <span className="text-xl text-gray-600">/mês</span>
-                    </div>
-                    <Badge className={`mt-3 ${config.bg} border-0 text-gray-700`}>
-                      {plan.credits} créditos/mês
-                    </Badge>
-                  </div>
-
-                  {/* Description */}
-                  <p className="text-center text-gray-600 text-sm mb-6">
-                    {plan.description}
-                  </p>
-
-                  {/* Features */}
-                  <ul className="space-y-3 mb-8">
-                    {plan.features?.map((feature: string, idx: number) => (
-                      <li key={idx} className="flex items-start gap-2 text-sm text-gray-700">
-                        <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                        <span>{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  {/* CTA Button */}
-                  <Button
-                    onClick={() => handleBuyPlan(plan.code)}
-                    disabled={loading && selectedPlan === plan.code}
-                    className={`w-full h-14 text-lg bg-gradient-to-r ${config.color} hover:opacity-90 text-white shadow-xl font-semibold`}
-                  >
-                    {loading && selectedPlan === plan.code ? (
-                      'Processando...'
-                    ) : (
-                      <>
-                        Assinar {plan.code}
-                        <Sparkles className="ml-2 h-5 w-5" />
-                      </>
-                    )}
-                  </Button>
-
-                  {/* Value per credit */}
-                  <p className="text-center text-xs text-gray-500 mt-3">
-                    R$ {(plan.priceBRL / plan.credits).toFixed(2)} por crédito • Renovação automática
-                  </p>
-                </Card>
-              </motion.div>
-            )
-          })}
+              {/* Value per credit */}
+              <p className="text-center text-xs text-gray-500 mt-3">
+                R$ 6.47 por crédito
+              </p>
+            </Card>
+          </motion.div>
         </div>
 
         {/* Benefits Section */}
@@ -263,19 +194,19 @@ export default function BuyCreditsPage() {
           className="max-w-3xl mx-auto mt-16 text-center"
         >
           <h3 className="text-lg font-semibold text-gray-900 mb-4">
-            Como funcionam as assinaturas?
+            Como funcionam os créditos?
           </h3>
           <p className="text-gray-600 mb-2">
-            <strong>Renovação mensal:</strong> Seus créditos são renovados todo mês automaticamente
+            <strong>1 crédito</strong> = 1 prompt gerado com IA
           </p>
           <p className="text-gray-600 mb-2">
-            <strong>1 crédito</strong> = 1 prompt gerado
-          </p>
-          <p className="text-gray-600 mb-6">
             <strong>5 créditos</strong> = 1 vídeo completo com IA
           </p>
+          <p className="text-gray-600 mb-6">
+            <strong>Créditos não expiram</strong> - use quando quiser
+          </p>
           <p className="text-sm text-gray-500">
-            Créditos não utilizados acumulam para o próximo mês. Cancele quando quiser.
+            Todos os créditos adicionados são seus para sempre. Use quando quiser!
           </p>
         </motion.div>
       </main>
@@ -302,4 +233,3 @@ export default function BuyCreditsPage() {
     </div>
   )
 }
-
