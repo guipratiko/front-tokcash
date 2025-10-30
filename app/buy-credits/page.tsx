@@ -104,26 +104,34 @@ export default function BuyCreditsPage() {
 
               {/* Description */}
               <p className="text-center text-gray-600 text-sm mb-6">
-                O plano ideal para começar a criar conteúdo viral
+                Ideal para iniciar sua jornada no TikTok
               </p>
 
               {/* Features */}
               <ul className="space-y-3 mb-8">
                 <li className="flex items-start gap-2 text-sm text-gray-700">
                   <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span>Geração de prompts com IA</span>
+                  <span>15 créditos renovados todo mês</span>
                 </li>
                 <li className="flex items-start gap-2 text-sm text-gray-700">
                   <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span>Geração de vídeos com IA</span>
+                  <span>Geração automática de vídeos curtos e virais</span>
                 </li>
                 <li className="flex items-start gap-2 text-sm text-gray-700">
                   <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span>Acesso a trends semanais</span>
+                  <span>Tendências semanais do TikTok</span>
                 </li>
                 <li className="flex items-start gap-2 text-sm text-gray-700">
                   <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span>Suporte por email</span>
+                  <span>Geração de prompts virais prontos</span>
+                </li>
+                <li className="flex items-start gap-2 text-sm text-gray-700">
+                  <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>Ideal para iniciar</span>
+                </li>
+                <li className="flex items-start gap-2 text-sm font-semibold text-green-700 bg-green-50 p-3 rounded-lg">
+                  <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>Fonte de renda extra +R$ 3.900/mês</span>
                 </li>
               </ul>
 

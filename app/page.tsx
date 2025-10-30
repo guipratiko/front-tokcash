@@ -340,19 +340,27 @@ export default function LandingPage() {
               <ul className="space-y-4 mb-8">
                 <li className="flex items-center gap-3 text-gray-700">
                   <CheckCircle className="h-5 w-5 text-purple-600 flex-shrink-0" />
-                  <span>Geração de prompts com IA</span>
+                  <span>15 créditos renovados todo mês</span>
                 </li>
                 <li className="flex items-center gap-3 text-gray-700">
                   <CheckCircle className="h-5 w-5 text-purple-600 flex-shrink-0" />
-                  <span>Geração de vídeos com IA</span>
+                  <span>Geração automática de vídeos curtos e virais</span>
                 </li>
                 <li className="flex items-center gap-3 text-gray-700">
                   <CheckCircle className="h-5 w-5 text-purple-600 flex-shrink-0" />
-                  <span>Acesso a trends semanais</span>
+                  <span>Tendências semanais do TikTok</span>
                 </li>
                 <li className="flex items-center gap-3 text-gray-700">
                   <CheckCircle className="h-5 w-5 text-purple-600 flex-shrink-0" />
-                  <span>Suporte por email</span>
+                  <span>Geração de prompts virais prontos</span>
+                </li>
+                <li className="flex items-center gap-3 text-gray-700">
+                  <CheckCircle className="h-5 w-5 text-purple-600 flex-shrink-0" />
+                  <span>Ideal para iniciar</span>
+                </li>
+                <li className="flex items-center gap-3 font-semibold text-green-700 bg-green-50 p-3 rounded-lg">
+                  <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
+                  <span>Fonte de renda extra +R$ 3.900/mês</span>
                 </li>
               </ul>
 
