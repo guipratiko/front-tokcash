@@ -40,7 +40,10 @@ export default function DashboardPage() {
     queryKey: ['credits', 'balance'],
     queryFn: async () => {
       const result = await api.getBalance()
-      return (result.data as any)?.balance || 0
+      return {
+        promptCredits: (result.data as any)?.promptCredits ?? 0,
+        videoCredits: (result.data as any)?.videoCredits ?? 0,
+      }
     },
   })
 
@@ -128,10 +131,20 @@ export default function DashboardPage() {
                   Ativos
                 </Badge>
               </div>
-              <div className="space-y-1">
-                <p className="text-white/80 text-sm font-medium">Créditos Disponíveis</p>
-                <p className="text-5xl font-bold">{balanceData || 0}</p>
-                <p className="text-white/70 text-sm">1 crédito = 1 prompt</p>
+              <div className="space-y-4">
+                {/* Créditos de Prompts */}
+                <div className="space-y-1">
+                  <p className="text-white/80 text-sm font-medium">Créditos de prompts Disponíveis</p>
+                  <p className="text-4xl font-bold">{balanceData?.promptCredits ?? 0}</p>
+                  <p className="text-white/70 text-sm">1 crédito = 1 prompt</p>
+                </div>
+                
+                {/* Créditos de Vídeos */}
+                <div className="space-y-1 pt-3 border-t border-white/20">
+                  <p className="text-white/80 text-sm font-medium">Créditos de videos Disponíveis</p>
+                  <p className="text-4xl font-bold">{balanceData?.videoCredits ?? 0}</p>
+                  <p className="text-white/70 text-sm">1 crédito = 1 video</p>
+                </div>
               </div>
               <div className="mt-4 pt-4 border-t border-white/20">
                 <Link href="/buy-credits">

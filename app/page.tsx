@@ -148,7 +148,7 @@ export default function LandingPage() {
           <ContentWrapper {...(isMounted && { variants: itemVariants })}>
             <Badge className="bg-gradient-to-r from-purple-100 to-pink-100 text-purple-700 border-0 px-4 py-2 text-sm font-medium">
               <Zap className="h-3 w-3 mr-1 inline" />
-              IA para Criadores de Conteudo
+              Ganhe dinheiro postando videos
             </Badge>
           </ContentWrapper>
 
@@ -240,8 +240,8 @@ export default function LandingPage() {
             {
               icon: Video,
               title: 'Geração de Vídeos',
-              description: 'Em Desenvolvimento - IA cria roteiro, voz, legendas e vídeo completo automaticamente',
-              gradient: 'from-gray-400 to-gray-500'
+              description: 'Cria roteiro, voz, legendas e vídeo completo automaticamente',
+              gradient: 'from-pink-500 to-purple-600'
             },
             {
               icon: TrendingUp,
@@ -392,7 +392,7 @@ export default function LandingPage() {
             Pronto para viralizar?
           </h2>
           <p className="text-xl text-purple-100 mb-8 max-w-2xl mx-auto">
-            Junte-se a milhares de criadores que já estão gerando conteúdo viral com IA
+            Junte-se a milhares de criadores que já estão gerando conteúdo viral
           </p>
           <Link href="/auth/register">
             <Button 

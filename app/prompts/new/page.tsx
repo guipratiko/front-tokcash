@@ -25,9 +25,14 @@ export default function NewPromptPage() {
     nicho: '',
     objetivo: '',
     cta: '',
-    duracao: '30s',
+    duracao: '8s',
     estilo: '',
     persona: '',
+    estiloVoz: '',
+    idioma: '',
+    tomVoz: '',
+    publicoAlvo: '',
+    ambienteVisual: '',
   })
 
   const generateMutation = useMutation({
@@ -45,6 +50,10 @@ export default function NewPromptPage() {
           setResult(prompt.resultText)
         }
       }
+    },
+    onError: (error: Error) => {
+      // Se houver erro sem dados, manter a mensagem de erro
+      console.error('Erro ao gerar prompt:', error.message)
     },
   })
 
@@ -170,9 +179,9 @@ export default function NewPromptPage() {
                     onChange={(e) => setFormData({ ...formData, duracao: e.target.value })}
                     className="flex h-12 w-full rounded-xl border border-gray-300 bg-white px-3 text-sm focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
                   >
-                    <option value="15s">15 segundos</option>
-                    <option value="30s">30 segundos</option>
-                    <option value="60s">60 segundos</option>
+                    <option value="4s">4 segundos</option>
+                    <option value="8s">8 segundos</option>
+                    <option value="12s">12 segundos</option>
                   </select>
                 </div>
 
@@ -188,6 +197,73 @@ export default function NewPromptPage() {
                     className="h-12 border-gray-300 focus:border-purple-500"
                   />
                 </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="estiloVoz" className="text-gray-700 font-medium">
+                    Estilo de Voz
+                  </Label>
+                  <Input
+                    id="estiloVoz"
+                    placeholder="Ex: voz jovem e energética"
+                    value={formData.estiloVoz}
+                    onChange={(e) => setFormData({ ...formData, estiloVoz: e.target.value })}
+                    className="h-12 border-gray-300 focus:border-purple-500"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="idioma" className="text-gray-700 font-medium">
+                    Idioma
+                  </Label>
+                  <Input
+                    id="idioma"
+                    placeholder="Ex: pt-BR"
+                    value={formData.idioma}
+                    onChange={(e) => setFormData({ ...formData, idioma: e.target.value })}
+                    className="h-12 border-gray-300 focus:border-purple-500"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="tomVoz" className="text-gray-700 font-medium">
+                  Tom de Voz
+                </Label>
+                <Input
+                  id="tomVoz"
+                  placeholder='Ex: "inspirador e envolvente"'
+                  value={formData.tomVoz}
+                  onChange={(e) => setFormData({ ...formData, tomVoz: e.target.value })}
+                  className="h-12 border-gray-300 focus:border-purple-500"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="publicoAlvo" className="text-gray-700 font-medium">
+                  Público Alvo
+                </Label>
+                <Input
+                  id="publicoAlvo"
+                  placeholder='Ex: "jovens e empreendedores digitais"'
+                  value={formData.publicoAlvo}
+                  onChange={(e) => setFormData({ ...formData, publicoAlvo: e.target.value })}
+                  className="h-12 border-gray-300 focus:border-purple-500"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="ambienteVisual" className="text-gray-700 font-medium">
+                  Ambiente Visual
+                </Label>
+                <Input
+                  id="ambienteVisual"
+                  placeholder='Ex: "Rua estilo brasil"'
+                  value={formData.ambienteVisual}
+                  onChange={(e) => setFormData({ ...formData, ambienteVisual: e.target.value })}
+                  className="h-12 border-gray-300 focus:border-purple-500"
+                />
               </div>
 
               <Button

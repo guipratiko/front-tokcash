@@ -311,7 +311,26 @@ export default function VideosPage() {
                     </div>
                   ) : (
                     (() => {
-                      const parsed = parseVideoResponse(video.resultText || '')
+                      const resultText = video.resultText || ''
+                      
+                      // Verificar se é uma mensagem de erro sobre créditos
+                      const isErrorAboutCredits = resultText.includes('créditos acabaram') || 
+                                                   resultText.includes('créditos para') ||
+                                                   resultText.includes('Adicione mais créditos') ||
+                                                   resultText.includes('adquira mais créditos')
+                      
+                      // Se for mensagem de erro sobre créditos, não mostrar botões
+                      if (isErrorAboutCredits) {
+                        return (
+                          <div className="bg-gradient-to-br from-red-50 to-orange-50 rounded-xl p-4 mb-4 border border-red-100">
+                            <p className="text-sm text-red-700">
+                              {resultText}
+                            </p>
+                          </div>
+                        )
+                      }
+                      
+                      const parsed = parseVideoResponse(resultText)
                       const videoUrl = parsed.videoUrl || (parsed.isDirectLink ? parsed.links[0]?.url : null)
                       
                       // Se for uma URL de vídeo, mostrar player

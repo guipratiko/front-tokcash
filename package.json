@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "TokCash Frontend - Geração de prompts e vídeos virais com IA",
   "scripts": {
+    "dev": "next dev",
     "start": "next dev"
   },
   "dependencies": {

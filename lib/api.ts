@@ -40,12 +40,17 @@ async function fetcher<T>(
       },
     });
 
+    const data = await response.json().catch(() => ({ message: 'Erro na requisição' }));
+    
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ message: 'Erro na requisição' }));
-      return { error: error.message || `Erro ${response.status}` };
+      // Se houver dados junto com o erro (como prompt ou video), incluir nos dados
+      const errorData: any = { error: data.error || data.message || `Erro ${response.status}` };
+      // Se a resposta contém prompt ou video mesmo com erro, incluir
+      if (data.prompt) errorData.data = { prompt: data.prompt };
+      if (data.video) errorData.data = { video: data.video };
+      return errorData;
     }
 
-    const data = await response.json();
     return { data };
   } catch (error: any) {
     return { error: error.message || 'Erro de conexão' };
@@ -72,6 +77,16 @@ export const api = {
   
   setPassword: (data: any) => fetcher('/auth/set-password', {
     method: 'POST',
+    body: JSON.stringify(data),
+  }),
+
+  updateProfile: (data: any) => fetcher('/auth/update-profile', {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  }),
+
+  changePassword: (data: any) => fetcher('/auth/change-password', {
+    method: 'PUT',
     body: JSON.stringify(data),
   }),
 
@@ -118,5 +133,8 @@ export const api = {
 
   // Trends
   getTrends: () => fetcher('/trends'),
+
+  // Admin
+  getAdminMetrics: (period: string) => fetcher(`/admin/metrics?period=${period}`),
 };
 

@@ -19,7 +19,10 @@ export function CreditBalance() {
     queryKey: ['credits', 'balance'],
     queryFn: async () => {
       const result = await api.getBalance()
-      return (result.data as any)?.balance || 0
+      return {
+        promptCredits: (result.data as any)?.promptCredits ?? 0,
+        videoCredits: (result.data as any)?.videoCredits ?? 0,
+      }
     },
   })
 
@@ -38,19 +41,40 @@ export function CreditBalance() {
               Ativos
             </Badge>
           </div>
-          <div className="space-y-1">
+          <div className="space-y-3">
             <p className="text-white/80 text-sm font-medium">
-              Créditos Disponíveis
+              Ativos
             </p>
-            <div className="flex items-baseline gap-2">
-              <p className="text-5xl font-bold">
-                <span className="animate-pulse">...</span>
+            
+            {/* Créditos de Prompts */}
+            <div className="space-y-1">
+              <p className="text-white/80 text-sm font-medium">
+                Créditos de prompts Disponíveis
               </p>
-              <span className="text-white/60 text-sm">créditos</span>
+              <div className="flex items-baseline gap-2">
+                <p className="text-4xl font-bold">
+                  <span className="animate-pulse">...</span>
+                </p>
+              </div>
+              <p className="text-white/70 text-sm">
+                1 crédito = 1 prompt
+              </p>
             </div>
-            <p className="text-white/70 text-sm">
-              1 crédito = 1 prompt | 5 créditos = 1 vídeo
-            </p>
+
+            {/* Créditos de Vídeos */}
+            <div className="space-y-1 pt-3 border-t border-white/20">
+              <p className="text-white/80 text-sm font-medium">
+                Créditos de videos Disponíveis
+              </p>
+              <div className="flex items-baseline gap-2">
+                <p className="text-4xl font-bold">
+                  <span className="animate-pulse">...</span>
+                </p>
+              </div>
+              <p className="text-white/70 text-sm">
+                1 crédito = 1 video
+              </p>
+            </div>
           </div>
         </div>
       </Card>
@@ -79,30 +103,48 @@ export function CreditBalance() {
             </Badge>
           </div>
 
-          <div className="space-y-1">
+          <div className="space-y-3">
             <p className="text-white/80 text-sm font-medium">
-              Créditos Disponíveis
+              Ativos
             </p>
-            <div className="flex items-baseline gap-2">
-              <p className="text-5xl font-bold">
-                {isLoading ? (
-                  <span className="animate-pulse">...</span>
-                ) : (
-                  data
-                )}
+            
+            {/* Créditos de Prompts */}
+            <div className="space-y-1">
+              <p className="text-white/80 text-sm font-medium">
+                Créditos de prompts Disponíveis
               </p>
-              <motion.span
-                className="text-white/60 text-sm"
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 }}
-              >
-                créditos
-              </motion.span>
+              <div className="flex items-baseline gap-2">
+                <p className="text-4xl font-bold">
+                  {isLoading ? (
+                    <span className="animate-pulse">...</span>
+                  ) : (
+                    data?.promptCredits ?? 0
+                  )}
+                </p>
+              </div>
+              <p className="text-white/70 text-sm">
+                1 crédito = 1 prompt
+              </p>
             </div>
-            <p className="text-white/70 text-sm">
-              1 crédito = 1 prompt | 5 créditos = 1 vídeo
-            </p>
+
+            {/* Créditos de Vídeos */}
+            <div className="space-y-1 pt-3 border-t border-white/20">
+              <p className="text-white/80 text-sm font-medium">
+                Créditos de videos Disponíveis
+              </p>
+              <div className="flex items-baseline gap-2">
+                <p className="text-4xl font-bold">
+                  {isLoading ? (
+                    <span className="animate-pulse">...</span>
+                  ) : (
+                    data?.videoCredits ?? 0
+                  )}
+                </p>
+              </div>
+              <p className="text-white/70 text-sm">
+                1 crédito = 1 video
+              </p>
+            </div>
           </div>
         </div>
       </Card>

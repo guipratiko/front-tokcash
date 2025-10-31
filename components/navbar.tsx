@@ -8,12 +8,26 @@ import { Sparkles, LogOut, Menu, X } from 'lucide-react'
 import { api } from '@/lib/api'
 import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { useQuery } from '@tanstack/react-query'
 
 export function Navbar() {
   const router = useRouter()
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [isScrolled, setIsScrolled] = useState(false)
+  
+  // Buscar dados do usuário para verificar se é admin
+  const { data: userData } = useQuery({
+    queryKey: ['user', 'me'],
+    queryFn: async () => {
+      const result = await api.me()
+      return (result.data as any)?.user
+    },
+    retry: false,
+  })
+
+  const adminIds = ['69017c312d3349fdcd287356', '6901fdf32d3349fdcd28737c', '6902beede139a32841ef03d5']
+  const isAdmin = userData && adminIds.includes(userData.id)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -34,6 +48,8 @@ export function Navbar() {
     { name: 'Prompts', path: '/prompts' },
     { name: 'Vídeos', path: '/videos' },
     { name: 'Planos', path: '/buy-credits' },
+    { name: 'Perfil', path: '/profile' },
+    ...(isAdmin ? [{ name: 'Admin', path: '/admin' }] : []),
   ]
 
   const isActive = (path: string) => pathname === path

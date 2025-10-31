@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { motion } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -112,6 +112,7 @@ export default function NewVideoPage() {
   const [result, setResult] = useState<string | null>(null)
   const [status, setStatus] = useState<'idle' | 'processing' | 'completed' | 'failed'>('idle')
   const [videoId, setVideoId] = useState<string | null>(null)
+  const [selectedPromptId, setSelectedPromptId] = useState<string>('')
   const [formData, setFormData] = useState({
     nicho: '',
     objetivo: '',
@@ -120,6 +121,18 @@ export default function NewVideoPage() {
     estilo: '',
     persona: '',
   })
+
+  // Buscar prompts completados para o seletor
+  const { data: promptsData } = useQuery({
+    queryKey: ['prompts'],
+    queryFn: async () => {
+      const result = await api.getPrompts()
+      return (result.data as any)?.prompts || []
+    },
+  })
+
+  // Filtrar apenas prompts completados
+  const completedPrompts = promptsData?.filter((p: any) => p.status === 'completed') || []
 
   const generateMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -137,6 +150,10 @@ export default function NewVideoPage() {
         }
       }
     },
+    onError: (error: Error) => {
+      // Se houver erro sem dados, manter a mensagem de erro
+      console.error('Erro ao gerar vídeo:', error.message)
+    },
   })
 
   // Polling para verificar status do vídeo
@@ -145,14 +162,15 @@ export default function NewVideoPage() {
       const interval = setInterval(async () => {
         try {
           const result = await api.getVideo(videoId)
-          if (result.data?.video) {
-            const video = result.data.video
+          if ((result.data as any)?.video) {
+            const video = (result.data as any).video
             setStatus(video.status)
             if (video.status === 'completed') {
               setResult(video.resultText)
               clearInterval(interval)
             } else if (video.status === 'failed') {
-              setResult(video.resultText || 'Erro ao gerar vídeo. Tente novamente.')
+              // Quando status for failed, não definir result para não mostrar botões
+              setResult(null)
               clearInterval(interval)
             }
           }
@@ -211,6 +229,60 @@ export default function NewVideoPage() {
           <Card className="p-6 border-0 shadow-xl shadow-gray-200/50 bg-white">
             <h2 className="text-lg font-semibold text-gray-900 mb-6">Informações do Vídeo</h2>
             <form onSubmit={handleSubmit} className="space-y-5">
+              {/* Seletor de Prompt */}
+              {completedPrompts.length > 0 && (
+                <div className="space-y-2">
+                  <Label htmlFor="selectedPrompt" className="text-gray-700 font-medium">
+                    Aproveitar um Prompt Criado (Opcional)
+                  </Label>
+                  <select
+                    id="selectedPrompt"
+                    value={selectedPromptId}
+                    onChange={(e) => {
+                      const promptId = e.target.value
+                      setSelectedPromptId(promptId)
+                      
+                      if (promptId) {
+                        const prompt = completedPrompts.find((p: any) => p._id === promptId)
+                        if (prompt && prompt.inputBrief) {
+                          setFormData({
+                            nicho: prompt.inputBrief.nicho || '',
+                            objetivo: prompt.resultText || prompt.inputBrief.objetivo || '',
+                            cta: prompt.inputBrief.cta || '',
+                            duracao: prompt.inputBrief.duracao || '8s',
+                            estilo: prompt.inputBrief.estilo || '',
+                            persona: prompt.inputBrief.persona || '',
+                          })
+                        }
+                      } else {
+                        // Limpar campos se não selecionar prompt
+                        setFormData({
+                          nicho: '',
+                          objetivo: '',
+                          cta: '',
+                          duracao: '8s',
+                          estilo: '',
+                          persona: '',
+                        })
+                      }
+                    }}
+                    className="flex h-12 w-full rounded-xl border border-gray-300 bg-white px-3 text-sm focus:border-pink-500 focus:ring-2 focus:ring-pink-500"
+                  >
+                    <option value="">-- Selecione um prompt para aproveitar --</option>
+                    {completedPrompts.map((prompt: any) => (
+                      <option key={prompt._id} value={prompt._id}>
+                        {prompt.inputBrief?.nicho || 'Prompt'} - {new Date(prompt.createdAt).toLocaleDateString('pt-BR')}
+                      </option>
+                    ))}
+                  </select>
+                  {selectedPromptId && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      ✓ Campos preenchidos automaticamente do prompt selecionado
+                    </p>
+                  )}
+                </div>
+              )}
+
               <div className="space-y-2">
                 <Label htmlFor="nicho" className="text-gray-700 font-medium">
                   Nicho / Tema *
