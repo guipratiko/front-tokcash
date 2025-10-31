@@ -116,7 +116,7 @@ export default function NewVideoPage() {
     nicho: '',
     objetivo: '',
     cta: '',
-    duracao: '30s',
+    duracao: '8s',
     estilo: '',
     persona: '',
   })
@@ -233,10 +233,10 @@ export default function NewVideoPage() {
                   id="objetivo"
                   placeholder="Ex: Ensinar a economizar 30% da renda mensal"
                   required
-                  rows={3}
+                  rows={6}
                   value={formData.objetivo}
                   onChange={(e) => setFormData({ ...formData, objetivo: e.target.value })}
-                  className="border-gray-300 focus:border-pink-500"
+                  className="border-gray-300 focus:border-pink-500 resize-y"
                 />
               </div>
 
@@ -264,9 +264,9 @@ export default function NewVideoPage() {
                     onChange={(e) => setFormData({ ...formData, duracao: e.target.value })}
                     className="flex h-12 w-full rounded-xl border border-gray-300 bg-white px-3 text-sm focus:border-pink-500 focus:ring-2 focus:ring-pink-500"
                   >
-                    <option value="15s">15 segundos</option>
-                    <option value="30s">30 segundos</option>
-                    <option value="60s">60 segundos</option>
+                    <option value="4s">4 segundos</option>
+                    <option value="8s">8 segundos</option>
+                    <option value="12s">12 segundos</option>
                   </select>
                 </div>
 
