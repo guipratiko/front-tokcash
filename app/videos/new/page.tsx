@@ -12,11 +12,43 @@ import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Navbar } from '@/components/navbar'
 import { Footer } from '@/components/footer'
-import { Video, Copy, CheckCircle, Wand2, Loader2, AlertCircle, ExternalLink } from 'lucide-react'
+import { Video, Copy, CheckCircle, Wand2, Loader2, AlertCircle, ExternalLink, Download } from 'lucide-react'
 import { api } from '@/lib/api'
+
+// Helper para verificar se uma URL é um arquivo de vídeo
+function isVideoUrl(url: string): boolean {
+  if (!url) return false
+  const videoExtensions = /\.(mp4|webm|ogg|mov|avi|mkv)(\?.*)?$/i
+  return videoExtensions.test(url) || url.includes('.mp4') || url.includes('video')
+}
 
 // Helper para parsear a resposta e extrair informações
 function parseVideoResponse(resultText: string) {
+  if (!resultText) {
+    return {
+      formattedText: '',
+      links: [],
+      hasLinks: false,
+      isDirectLink: false,
+      isVideoUrl: false,
+      videoUrl: null
+    }
+  }
+
+  const trimmedText = resultText.trim()
+  
+  // Verificar se é uma URL direta de vídeo .mp4
+  if (trimmedText.startsWith('http') && isVideoUrl(trimmedText)) {
+    return {
+      formattedText: trimmedText,
+      links: [{ text: 'Download Vídeo', url: trimmedText }],
+      hasLinks: true,
+      isDirectLink: true,
+      isVideoUrl: true,
+      videoUrl: trimmedText
+    }
+  }
+
   // Extrair links diretos (http/https)
   const urlRegex = /(https?:\/\/[^\s]+)/g
   
@@ -31,6 +63,19 @@ function parseVideoResponse(resultText: string) {
     if (Array.isArray(parsed) && parsed[0]?.output) {
       const output = parsed[0].output
       
+      // Verificar se o output é uma URL de vídeo
+      if (output.trim().startsWith('http') && isVideoUrl(output.trim())) {
+        const videoUrl = output.trim()
+        return {
+          formattedText: output,
+          links: [{ text: 'Download Vídeo', url: videoUrl }],
+          hasLinks: true,
+          isDirectLink: true,
+          isVideoUrl: true,
+          videoUrl
+        }
+      }
+      
       // Extrair links markdown
       let match
       while ((match = markdownLinkRegex.exec(output)) !== null) {
@@ -41,7 +86,31 @@ function parseVideoResponse(resultText: string) {
       if (links.length === 0) {
         while ((match = urlRegex.exec(output)) !== null) {
           const url = match[1]
+          // Verificar se é vídeo
+          if (isVideoUrl(url)) {
+            return {
+              formattedText: output,
+              links: [{ text: 'Download Vídeo', url }],
+              hasLinks: true,
+              isDirectLink: true,
+              isVideoUrl: true,
+              videoUrl: url
+            }
+          }
           links.push({ text: 'Assistir Vídeo', url })
+        }
+      } else {
+        // Verificar se algum link é vídeo
+        const videoLink = links.find(link => isVideoUrl(link.url))
+        if (videoLink) {
+          return {
+            formattedText: output,
+            links,
+            hasLinks: true,
+            isDirectLink: links.length === 1,
+            isVideoUrl: true,
+            videoUrl: videoLink.url
+          }
         }
       }
       
@@ -49,7 +118,9 @@ function parseVideoResponse(resultText: string) {
         formattedText: output,
         links,
         hasLinks: links.length > 0,
-        isDirectLink: links.length === 1 && output.trim().startsWith('http')
+        isDirectLink: links.length === 1 && output.trim().startsWith('http'),
+        isVideoUrl: false,
+        videoUrl: null
       }
     }
   } catch (e) {
@@ -66,7 +137,30 @@ function parseVideoResponse(resultText: string) {
   if (links.length === 0) {
     while ((match = urlRegex.exec(resultText)) !== null) {
       const url = match[1]
+      if (isVideoUrl(url)) {
+        return {
+          formattedText: resultText,
+          links: [{ text: 'Download Vídeo', url }],
+          hasLinks: true,
+          isDirectLink: true,
+          isVideoUrl: true,
+          videoUrl: url
+        }
+      }
       links.push({ text: 'Assistir Vídeo', url })
+    }
+  } else {
+    // Verificar se algum link é vídeo
+    const videoLink = links.find(link => isVideoUrl(link.url))
+    if (videoLink) {
+      return {
+        formattedText: resultText,
+        links,
+        hasLinks: true,
+        isDirectLink: links.length === 1,
+        isVideoUrl: true,
+        videoUrl: videoLink.url
+      }
     }
   }
   
@@ -74,7 +168,9 @@ function parseVideoResponse(resultText: string) {
     formattedText: resultText,
     links,
     hasLinks: links.length > 0,
-    isDirectLink: links.length === 1 && resultText.trim().startsWith('http')
+    isDirectLink: links.length === 1 && resultText.trim().startsWith('http'),
+    isVideoUrl: false,
+    videoUrl: null
   }
 }
 
@@ -335,7 +431,86 @@ export default function NewVideoPage() {
               (() => {
                 const parsed = parseVideoResponse(result)
                 
-                // Se for apenas um link direto, mostrar só o botão grande e bonito
+                // Se for uma URL de vídeo, mostrar player e botão de download
+                if (parsed.isVideoUrl && parsed.videoUrl) {
+                  const handleDownload = () => {
+                    const link = document.createElement('a')
+                    link.href = parsed.videoUrl!
+                    link.download = videoId ? `video-${videoId}.mp4` : 'video.mp4'
+                    document.body.appendChild(link)
+                    link.click()
+                    document.body.removeChild(link)
+                  }
+                  
+                  return (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      className="space-y-6"
+                    >
+                      <div className="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-8 border-2 border-green-200">
+                        <div className="text-center mb-6">
+                          <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
+                          <h3 className="text-xl font-bold text-gray-900 mb-2">Vídeo Gerado com Sucesso!</h3>
+                          <p className="text-gray-600">Seu vídeo está pronto para ser assistido</p>
+                        </div>
+                        
+                        <div className="rounded-xl overflow-hidden border-2 border-green-300 bg-black mb-6">
+                          <video 
+                            src={parsed.videoUrl} 
+                            controls 
+                            className="w-full h-auto max-h-96"
+                            preload="metadata"
+                          >
+                            Seu navegador não suporta o elemento de vídeo.
+                          </video>
+                        </div>
+                        
+                        <div className="flex gap-3">
+                          <Button
+                            size="lg"
+                            className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white shadow-xl"
+                            onClick={handleDownload}
+                          >
+                            <Download className="h-5 w-5 mr-2" />
+                            Baixar Vídeo
+                          </Button>
+                          <Button
+                            size="lg"
+                            variant="outline"
+                            onClick={() => {
+                              navigator.clipboard.writeText(parsed.videoUrl || '')
+                              setCopied(true)
+                              setTimeout(() => setCopied(false), 2000)
+                            }}
+                            className="flex-1 border-2 border-gray-300 hover:border-pink-400 hover:bg-pink-50"
+                          >
+                            {copied ? (
+                              <>
+                                <CheckCircle className="h-5 w-5 mr-2 text-green-600" />
+                                Copiado!
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="h-5 w-5 mr-2" />
+                                Copiar URL
+                              </>
+                            )}
+                          </Button>
+                        </div>
+                      </div>
+
+                      <Button
+                        onClick={() => router.push('/videos')}
+                        className="w-full bg-pink-600 hover:bg-pink-700 text-white"
+                      >
+                        Ver Todos os Vídeos
+                      </Button>
+                    </motion.div>
+                  )
+                }
+                
+                // Se for apenas um link direto (não vídeo), mostrar só o botão grande e bonito
                 if (parsed.isDirectLink) {
                   return (
                     <motion.div
