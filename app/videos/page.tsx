@@ -12,40 +12,17 @@ import { Video, Plus, Copy, CheckCircle, Calendar, Loader2, AlertCircle, Trash2,
 import { api } from '@/lib/api'
 import { useState } from 'react'
 
-// Helper para verificar se uma URL é um arquivo de vídeo
+// Helper para verificar se uma URL é de vídeo
 function isVideoUrl(url: string): boolean {
-  if (!url) return false
-  const videoExtensions = /\.(mp4|webm|ogg|mov|avi|mkv)(\?.*)?$/i
-  return videoExtensions.test(url) || url.includes('.mp4') || url.includes('video')
+  const videoExtensions = ['.mp4', '.webm', '.mov', '.avi', '.mkv', '.flv', '.wmv', '.m4v']
+  const urlLower = url.toLowerCase()
+  return videoExtensions.some(ext => urlLower.includes(ext)) || 
+         urlLower.includes('/video/') || 
+         urlLower.includes('video=')
 }
 
 // Helper para parsear a resposta e extrair informações
 function parseVideoResponse(resultText: string) {
-  if (!resultText) {
-    return {
-      formattedText: '',
-      links: [],
-      hasLinks: false,
-      isDirectLink: false,
-      isVideoUrl: false,
-      videoUrl: null
-    }
-  }
-
-  const trimmedText = resultText.trim()
-  
-  // Verificar se é uma URL direta de vídeo .mp4
-  if (trimmedText.startsWith('http') && isVideoUrl(trimmedText)) {
-    return {
-      formattedText: trimmedText,
-      links: [{ text: 'Download Vídeo', url: trimmedText }],
-      hasLinks: true,
-      isDirectLink: true,
-      isVideoUrl: true,
-      videoUrl: trimmedText
-    }
-  }
-
   // Extrair links diretos (http/https)
   const urlRegex = /(https?:\/\/[^\s]+)/g
   
@@ -53,25 +30,13 @@ function parseVideoResponse(resultText: string) {
   const markdownLinkRegex = /\[([^\]]+)\]\(([^)]+)\)/g
   
   const links: Array<{ text: string; url: string }> = []
+  let videoUrl: string | null = null
   
   // Primeiro, tenta parsear como JSON
   try {
     const parsed = JSON.parse(resultText)
     if (Array.isArray(parsed) && parsed[0]?.output) {
       const output = parsed[0].output
-      
-      // Verificar se o output é uma URL de vídeo
-      if (output.trim().startsWith('http') && isVideoUrl(output.trim())) {
-        const videoUrl = output.trim()
-        return {
-          formattedText: output,
-          links: [{ text: 'Download Vídeo', url: videoUrl }],
-          hasLinks: true,
-          isDirectLink: true,
-          isVideoUrl: true,
-          videoUrl
-        }
-      }
       
       // Extrair links markdown
       let match
@@ -83,41 +48,20 @@ function parseVideoResponse(resultText: string) {
       if (links.length === 0) {
         while ((match = urlRegex.exec(output)) !== null) {
           const url = match[1]
-          // Verificar se é vídeo
-          if (isVideoUrl(url)) {
-            return {
-              formattedText: output,
-              links: [{ text: 'Download Vídeo', url }],
-              hasLinks: true,
-              isDirectLink: true,
-              isVideoUrl: true,
-              videoUrl: url
-            }
-          }
           links.push({ text: 'Assistir Vídeo', url })
         }
-      } else {
-        // Verificar se algum link é vídeo
-        const videoLink = links.find(link => isVideoUrl(link.url))
-        if (videoLink) {
-          return {
-            formattedText: output,
-            links,
-            hasLinks: true,
-            isDirectLink: links.length === 1,
-            isVideoUrl: true,
-            videoUrl: videoLink.url
-          }
-        }
       }
+      
+      // Verificar se é URL de vídeo
+      const allUrls = links.map(l => l.url).concat(output.match(urlRegex) || [])
+      videoUrl = allUrls.find(url => isVideoUrl(url)) || null
       
       return {
         formattedText: output,
         links,
         hasLinks: links.length > 0,
         isDirectLink: links.length === 1 && output.trim().startsWith('http'),
-        isVideoUrl: false,
-        videoUrl: null
+        videoUrl: videoUrl || (links.length === 1 && isVideoUrl(links[0].url) ? links[0].url : null)
       }
     }
   } catch (e) {
@@ -134,30 +78,19 @@ function parseVideoResponse(resultText: string) {
   if (links.length === 0) {
     while ((match = urlRegex.exec(resultText)) !== null) {
       const url = match[1]
-      if (isVideoUrl(url)) {
-        return {
-          formattedText: resultText,
-          links: [{ text: 'Download Vídeo', url }],
-          hasLinks: true,
-          isDirectLink: true,
-          isVideoUrl: true,
-          videoUrl: url
-        }
-      }
       links.push({ text: 'Assistir Vídeo', url })
     }
-  } else {
-    // Verificar se algum link é vídeo
-    const videoLink = links.find(link => isVideoUrl(link.url))
-    if (videoLink) {
-      return {
-        formattedText: resultText,
-        links,
-        hasLinks: true,
-        isDirectLink: links.length === 1,
-        isVideoUrl: true,
-        videoUrl: videoLink.url
-      }
+  }
+  
+  // Verificar se é URL de vídeo
+  const allUrls = links.map(l => l.url).concat(resultText.match(urlRegex) || [])
+  videoUrl = allUrls.find(url => isVideoUrl(url)) || null
+  
+  // Se não encontrou vídeo nos links e o texto é uma URL direta, verificar se é vídeo
+  if (!videoUrl && resultText.trim().startsWith('http')) {
+    const trimmedUrl = resultText.trim()
+    if (isVideoUrl(trimmedUrl)) {
+      videoUrl = trimmedUrl
     }
   }
   
@@ -166,8 +99,7 @@ function parseVideoResponse(resultText: string) {
     links,
     hasLinks: links.length > 0,
     isDirectLink: links.length === 1 && resultText.trim().startsWith('http'),
-    isVideoUrl: false,
-    videoUrl: null
+    videoUrl: videoUrl || (links.length === 1 && isVideoUrl(links[0].url) ? links[0].url : null)
   }
 }
 
@@ -380,54 +312,54 @@ export default function VideosPage() {
                   ) : (
                     (() => {
                       const parsed = parseVideoResponse(video.resultText || '')
+                      const videoUrl = parsed.videoUrl || (parsed.isDirectLink ? parsed.links[0]?.url : null)
                       
-                      // Se for uma URL de vídeo, mostrar player e botão de download
-                      if (parsed.isVideoUrl && parsed.videoUrl) {
-                        const handleDownload = () => {
-                          const link = document.createElement('a')
-                          link.href = parsed.videoUrl!
-                          link.download = `video-${video._id}.mp4`
-                          document.body.appendChild(link)
-                          link.click()
-                          document.body.removeChild(link)
-                        }
-                        
+                      // Se for uma URL de vídeo, mostrar player
+                      if (videoUrl && isVideoUrl(videoUrl)) {
                         return (
-                          <div className="mb-4 space-y-4">
-                            <div className="rounded-xl overflow-hidden border-2 border-pink-200 bg-black">
-                              <video 
-                                src={parsed.videoUrl} 
-                                controls 
-                                className="w-full h-auto max-h-96"
+                          <div className="mb-4 space-y-3">
+                            {/* Player de Vídeo */}
+                            <div className="rounded-xl overflow-hidden bg-black shadow-lg">
+                              <video
+                                controls
+                                className="w-full h-auto max-h-64"
+                                src={videoUrl}
                                 preload="metadata"
                               >
-                                Seu navegador não suporta o elemento de vídeo.
+                                Seu navegador não suporta a tag de vídeo.
                               </video>
                             </div>
+                            
+                            {/* Botões de ação */}
                             <div className="flex gap-2">
                               <Button
-                                size="lg"
-                                className="flex-1 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white shadow-lg"
-                                onClick={handleDownload}
+                                size="sm"
+                                variant="outline"
+                                onClick={() => {
+                                  const link = document.createElement('a')
+                                  link.href = videoUrl!
+                                  link.download = `video-${video._id}.mp4`
+                                  document.body.appendChild(link)
+                                  link.click()
+                                  document.body.removeChild(link)
+                                }}
+                                className="flex-1 border-2 border-green-300 hover:border-green-400 hover:bg-green-50 text-green-700"
                               >
-                                <Download className="h-5 w-5 mr-2" />
-                                Baixar Vídeo
+                                <Download className="h-4 w-4 mr-2" />
+                                Download
                               </Button>
                               <Button
-                                size="lg"
+                                size="sm"
                                 variant="outline"
-                                className="border-2 border-pink-300 hover:border-pink-400 hover:bg-pink-50 text-pink-700"
-                                onClick={() => handleCopy(parsed.videoUrl || '', video._id)}
+                                onClick={() => handleCopy(videoUrl, video._id)}
+                                className="flex-1 border-2 border-gray-300 hover:border-pink-400 hover:bg-pink-50"
                               >
                                 {copiedId === video._id ? (
-                                  <>
-                                    <CheckCircle className="h-5 w-5 mr-2 text-green-600" />
-                                    Copiado!
-                                  </>
+                                  <CheckCircle className="h-4 w-4 text-green-600" />
                                 ) : (
                                   <>
-                                    <Copy className="h-5 w-5 mr-2" />
-                                    Copiar URL
+                                    <Copy className="h-4 w-4 mr-2" />
+                                    Copiar
                                   </>
                                 )}
                               </Button>
@@ -436,7 +368,7 @@ export default function VideosPage() {
                         )
                       }
                       
-                      // Se for apenas um link direto (não vídeo), mostrar só o botão
+                      // Se for apenas um link direto, mostrar só o botão
                       if (parsed.isDirectLink) {
                         return (
                           <div className="mb-4">
