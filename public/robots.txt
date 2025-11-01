@@ -1,0 +1,11 @@
+# robots.txt para TokCash
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /auth/set-password
+
+# Sitemap
+Sitemap: https://www.tokcash.com.br/sitemap.xml
+

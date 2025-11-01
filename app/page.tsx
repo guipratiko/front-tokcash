@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Footer } from '@/components/footer'
+import { JsonLd, organizationSchema, productSchema, webApplicationSchema } from '@/components/json-ld'
 import { Sparkles, Video, TrendingUp, Zap, ArrowRight, CheckCircle, Star } from 'lucide-react'
 
 export default function LandingPage() {
@@ -50,7 +51,12 @@ export default function LandingPage() {
   const SectionWrapper = isMounted ? motion.section : 'section'
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-white via-purple-50/50 to-white">
+    <>
+      <JsonLd data={organizationSchema} />
+      <JsonLd data={productSchema} />
+      <JsonLd data={webApplicationSchema} />
+      
+      <div className="min-h-screen bg-gradient-to-b from-white via-purple-50/50 to-white">
       {/* Floating gradient orbs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 -left-32 w-[600px] h-[600px] bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob" />
@@ -431,5 +437,6 @@ export default function LandingPage() {
         }
       `}</style>
     </div>
+    </>
   )
 }
