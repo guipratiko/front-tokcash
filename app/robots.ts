@@ -7,10 +7,37 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       {
         userAgent: '*',
-        allow: '/',
+        allow: [
+          '/',
+          '/auth/login',
+          '/auth/register',
+        ],
         disallow: [
           '/admin/',
           '/api/',
+          '/dashboard/',
+          '/prompts/',
+          '/videos/',
+          '/profile/',
+          '/buy-credits/',
+          '/auth/set-password',
+        ],
+      },
+      {
+        userAgent: 'Googlebot',
+        allow: [
+          '/',
+          '/auth/login',
+          '/auth/register',
+        ],
+        disallow: [
+          '/admin/',
+          '/api/',
+          '/dashboard/',
+          '/prompts/',
+          '/videos/',
+          '/profile/',
+          '/buy-credits/',
           '/auth/set-password',
         ],
       },
