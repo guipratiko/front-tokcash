@@ -100,22 +100,24 @@ export default function LandingPage() {
                   Entrar
                 </Button>
               </Link>
-              <Link href="/auth/register">
-                <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg shadow-purple-500/30">
-                  Começar Agora
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
+              <Button 
+                onClick={() => window.location.href = 'https://checkout.perfectpay.com.br/pay/PPU38CQ2L0K'}
+                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg shadow-purple-500/30"
+              >
+                Começar Agora
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
             </div>
 
             {/* Mobile - Botão Começar Agora */}
             <div className="md:hidden">
-              <Link href="/auth/register">
-                <Button className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg shadow-purple-500/30">
-                  Começar Agora
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Button>
-              </Link>
+              <Button 
+                onClick={() => window.location.href = 'https://checkout.perfectpay.com.br/pay/PPU38CQ2L0K'}
+                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg shadow-purple-500/30"
+              >
+                Começar Agora
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Button>
             </div>
           </div>
         </div>
@@ -176,15 +178,14 @@ export default function LandingPage() {
             {...(isMounted && { variants: itemVariants })}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4"
           >
-            <Link href="/auth/register">
-              <Button 
-                size="lg" 
-                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-lg px-8 py-6 rounded-2xl shadow-2xl shadow-purple-500/30 hover:shadow-purple-500/40 transition-all"
-              >
-                Começar Agora
-                <Sparkles className="ml-2 h-5 w-5" />
-              </Button>
-            </Link>
+            <Button 
+              size="lg"
+              onClick={() => window.location.href = 'https://checkout.perfectpay.com.br/pay/PPU38CQ2L0K'}
+              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-lg px-8 py-6 rounded-2xl shadow-2xl shadow-purple-500/30 hover:shadow-purple-500/40 transition-all"
+            >
+              Começar Agora
+              <Sparkles className="ml-2 h-5 w-5" />
+            </Button>
             <Link href="#features">
               <Button 
                 size="lg" 
@@ -364,11 +365,12 @@ export default function LandingPage() {
                 </li>
               </ul>
 
-              <Link href="/auth/register" className="block">
-                <Button className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-6 rounded-xl shadow-xl shadow-purple-500/30">
-                  Começar Agora
-                </Button>
-              </Link>
+              <Button 
+                onClick={() => window.location.href = 'https://checkout.perfectpay.com.br/pay/PPU38CQ2L0K'}
+                className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-6 rounded-xl shadow-xl shadow-purple-500/30"
+              >
+                Começar Agora
+              </Button>
 
               <p className="text-center text-xs text-gray-500 mt-3">
                 R$ 6.47 por crédito
