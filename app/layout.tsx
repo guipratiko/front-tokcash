@@ -32,9 +32,29 @@ export const metadata: Metadata = {
     canonical: '/',
   },
   icons: {
-    icon: '/images/logos/favicon.png',
-    shortcut: '/images/logos/favicon.png',
-    apple: '/images/logos/favicon.png',
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/images/logos/favicon.png', type: 'image/png', sizes: '32x32' },
+      { url: '/images/logos/favicon.png', type: 'image/png', sizes: '16x16' },
+    ],
+    shortcut: '/favicon.ico',
+    apple: [
+      { url: '/images/logos/favicon.png', sizes: '180x180', type: 'image/png' },
+    ],
+    other: [
+      {
+        rel: 'icon',
+        type: 'image/png',
+        sizes: '192x192',
+        url: '/images/logos/favicon.png',
+      },
+      {
+        rel: 'icon',
+        type: 'image/png',
+        sizes: '512x512',
+        url: '/images/logos/favicon.png',
+      },
+    ],
   },
   openGraph: {
     title: 'TokCash - Ganhe Dinheiro Postando Vídeos no TikTok',
