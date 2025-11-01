@@ -2,21 +2,8 @@
 
 User-agent: *
 Allow: /
-Allow: /auth/login
-Allow: /auth/register
-Disallow: /admin/
-Disallow: /api/
-Disallow: /dashboard/
-Disallow: /prompts/
-Disallow: /videos/
-Disallow: /profile/
-Disallow: /buy-credits/
-Disallow: /auth/set-password
-
-User-agent: Googlebot
-Allow: /
-Allow: /auth/login
-Allow: /auth/register
+Allow: /sitemap.xml
+Allow: /robots.txt
 Disallow: /admin/
 Disallow: /api/
 Disallow: /dashboard/
