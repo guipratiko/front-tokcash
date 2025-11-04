@@ -90,6 +90,16 @@ export const api = {
     body: JSON.stringify(data),
   }),
 
+  forgotPassword: (data: { email: string }) => fetcher('/auth/forgot-password', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }),
+
+  resetPassword: (data: { token: string; password: string }) => fetcher('/auth/reset-password', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  }),
+
   // Plans
   getPlans: () => fetcher('/plans'),
   
