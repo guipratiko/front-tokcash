@@ -103,9 +103,9 @@ export default function LoginPage() {
 
             <div className="space-y-2">
               <div className="flex items-center justify-between">
-                <Label htmlFor="password" className="text-gray-700 font-medium">
-                  Senha
-                </Label>
+              <Label htmlFor="password" className="text-gray-700 font-medium">
+                Senha
+              </Label>
                 <Link 
                   href="/auth/forgot-password" 
                   className="text-sm text-purple-600 hover:text-purple-700 font-medium hover:underline"

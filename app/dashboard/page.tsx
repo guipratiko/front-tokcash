@@ -133,10 +133,10 @@ export default function DashboardPage() {
               </div>
               <div className="space-y-4">
                 {/* Créditos de Prompts */}
-                <div className="space-y-1">
+              <div className="space-y-1">
                   <p className="text-white/80 text-sm font-medium">Créditos de prompts Disponíveis</p>
                   <p className="text-4xl font-bold">{balanceData?.promptCredits ?? 0}</p>
-                  <p className="text-white/70 text-sm">1 crédito = 1 prompt</p>
+                <p className="text-white/70 text-sm">1 crédito = 1 prompt</p>
                 </div>
                 
                 {/* Créditos de Vídeos */}

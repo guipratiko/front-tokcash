@@ -50,11 +50,11 @@ export function CreditBalance() {
             <div className="space-y-1">
               <p className="text-white/80 text-sm font-medium">
                 Créditos de prompts Disponíveis
-              </p>
-              <div className="flex items-baseline gap-2">
+            </p>
+            <div className="flex items-baseline gap-2">
                 <p className="text-4xl font-bold">
-                  <span className="animate-pulse">...</span>
-                </p>
+                <span className="animate-pulse">...</span>
+              </p>
               </div>
               <p className="text-white/70 text-sm">
                 1 crédito = 1 prompt
@@ -70,10 +70,10 @@ export function CreditBalance() {
                 <p className="text-4xl font-bold">
                   <span className="animate-pulse">...</span>
                 </p>
-              </div>
-              <p className="text-white/70 text-sm">
+            </div>
+            <p className="text-white/70 text-sm">
                 1 crédito = 1 video
-              </p>
+            </p>
             </div>
           </div>
         </div>
@@ -112,15 +112,15 @@ export function CreditBalance() {
             <div className="space-y-1">
               <p className="text-white/80 text-sm font-medium">
                 Créditos de prompts Disponíveis
-              </p>
-              <div className="flex items-baseline gap-2">
+            </p>
+            <div className="flex items-baseline gap-2">
                 <p className="text-4xl font-bold">
-                  {isLoading ? (
-                    <span className="animate-pulse">...</span>
-                  ) : (
+                {isLoading ? (
+                  <span className="animate-pulse">...</span>
+                ) : (
                     data?.promptCredits ?? 0
-                  )}
-                </p>
+                )}
+              </p>
               </div>
               <p className="text-white/70 text-sm">
                 1 crédito = 1 prompt
@@ -140,10 +140,10 @@ export function CreditBalance() {
                     data?.videoCredits ?? 0
                   )}
                 </p>
-              </div>
-              <p className="text-white/70 text-sm">
+            </div>
+            <p className="text-white/70 text-sm">
                 1 crédito = 1 video
-              </p>
+            </p>
             </div>
           </div>
         </div>

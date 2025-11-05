@@ -56,7 +56,7 @@ export default function LandingPage() {
       <JsonLd data={productSchema} />
       <JsonLd data={webApplicationSchema} />
       
-      <div className="min-h-screen bg-gradient-to-b from-white via-purple-50/50 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-white via-purple-50/50 to-white">
       {/* Floating gradient orbs */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-1/4 -left-32 w-[600px] h-[600px] bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob" />
@@ -110,9 +110,9 @@ export default function LandingPage() {
                 onClick={() => window.location.href = 'https://checkout.perfectpay.com.br/pay/PPU38CQ2L0K'}
                 className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg shadow-purple-500/30"
               >
-                Começar Agora
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+                  Começar Agora
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
             </div>
 
             {/* Mobile - Botão Começar Agora */}
@@ -121,9 +121,9 @@ export default function LandingPage() {
                 onClick={() => window.location.href = 'https://checkout.perfectpay.com.br/pay/PPU38CQ2L0K'}
                 className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white shadow-lg shadow-purple-500/30"
               >
-                Começar Agora
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
+                  Começar Agora
+                  <ArrowRight className="ml-2 h-4 w-4" />
+                </Button>
             </div>
           </div>
         </div>
@@ -184,14 +184,14 @@ export default function LandingPage() {
             {...(isMounted && { variants: itemVariants })}
             className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4"
           >
-            <Button 
-              size="lg"
+              <Button 
+                size="lg" 
               onClick={() => window.location.href = 'https://checkout.perfectpay.com.br/pay/PPU38CQ2L0K'}
-              className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-lg px-8 py-6 rounded-2xl shadow-2xl shadow-purple-500/30 hover:shadow-purple-500/40 transition-all"
-            >
-              Começar Agora
-              <Sparkles className="ml-2 h-5 w-5" />
-            </Button>
+                className="bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white text-lg px-8 py-6 rounded-2xl shadow-2xl shadow-purple-500/30 hover:shadow-purple-500/40 transition-all"
+              >
+                Começar Agora
+                <Sparkles className="ml-2 h-5 w-5" />
+              </Button>
             <Link href="#features">
               <Button 
                 size="lg" 
@@ -375,8 +375,8 @@ export default function LandingPage() {
                 onClick={() => window.location.href = 'https://checkout.perfectpay.com.br/pay/PPU38CQ2L0K'}
                 className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white py-6 rounded-xl shadow-xl shadow-purple-500/30"
               >
-                Começar Agora
-              </Button>
+                  Começar Agora
+                </Button>
 
               <p className="text-center text-xs text-gray-500 mt-3">
                 R$ 6.47 por crédito

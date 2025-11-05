@@ -60,14 +60,14 @@ export default function BuyCreditsPage() {
         >
           <Card className="p-6 border-2 border-purple-200 shadow-xl shadow-purple-200/50 bg-gradient-to-br from-white to-purple-50">
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div>
+            <div className="flex items-center justify-between">
+              <div>
                   <p className="text-sm text-gray-600 mb-1">Créditos de Prompts</p>
                   <p className="text-3xl font-bold text-purple-600">{balanceData?.promptCredits ?? 0}</p>
                   <p className="text-xs text-gray-500 mt-1">1 crédito = 1 prompt</p>
-                </div>
-                <div className="p-4 bg-purple-100 rounded-2xl">
-                  <Coins className="h-10 w-10 text-purple-600" />
+              </div>
+              <div className="p-4 bg-purple-100 rounded-2xl">
+                <Coins className="h-10 w-10 text-purple-600" />
                 </div>
               </div>
               <div className="pt-4 border-t border-gray-200">
@@ -87,74 +87,74 @@ export default function BuyCreditsPage() {
         <div className="max-w-6xl mx-auto mb-12">
           <div className="grid md:grid-cols-3 gap-6">
             {/* Main Plan */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              whileHover={{ y: -8, scale: 1.02 }}
-              className="relative"
-            >
-              <Card className="p-8 border-0 shadow-2xl hover:shadow-3xl transition-all duration-300 bg-gradient-to-br from-purple-50 to-pink-50">
-                <div className="flex justify-center mb-6">
-                  <div className="p-4 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl shadow-lg">
-                    <Zap className="h-10 w-10 text-white" />
-                  </div>
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            whileHover={{ y: -8, scale: 1.02 }}
+            className="relative"
+          >
+            <Card className="p-8 border-0 shadow-2xl hover:shadow-3xl transition-all duration-300 bg-gradient-to-br from-purple-50 to-pink-50">
+              <div className="flex justify-center mb-6">
+                <div className="p-4 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl shadow-lg">
+                  <Zap className="h-10 w-10 text-white" />
                 </div>
+              </div>
 
-                <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">
-                  Plano Único
-                </h3>
+              <h3 className="text-2xl font-bold text-gray-900 text-center mb-2">
+                Plano Único
+              </h3>
 
-                <div className="text-center mb-4">
-                  <div className="flex items-baseline justify-center gap-1">
-                    <span className="text-xl text-gray-600">R$</span>
-                    <span className="text-5xl font-bold text-gray-900">97</span>
-                    <span className="text-xl text-gray-600">/mês</span>
-                  </div>
-                  <Badge className="mt-3 bg-purple-100 border-0 text-gray-700">
-                    15 créditos
-                  </Badge>
+              <div className="text-center mb-4">
+                <div className="flex items-baseline justify-center gap-1">
+                  <span className="text-xl text-gray-600">R$</span>
+                  <span className="text-5xl font-bold text-gray-900">97</span>
+                  <span className="text-xl text-gray-600">/mês</span>
                 </div>
+                <Badge className="mt-3 bg-purple-100 border-0 text-gray-700">
+                  15 créditos
+                </Badge>
+              </div>
 
-                <p className="text-center text-gray-600 text-sm mb-6">
-                  Ideal para iniciar sua jornada no TikTok
-                </p>
+              <p className="text-center text-gray-600 text-sm mb-6">
+                Ideal para iniciar sua jornada no TikTok
+              </p>
 
-                <ul className="space-y-3 mb-8">
-                  <li className="flex items-start gap-2 text-sm text-gray-700">
-                    <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span>15 créditos renovados todo mês</span>
-                  </li>
-                  <li className="flex items-start gap-2 text-sm text-gray-700">
-                    <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span>Geração automática de vídeos curtos e virais</span>
-                  </li>
-                  <li className="flex items-start gap-2 text-sm text-gray-700">
-                    <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span>Tendências semanais do TikTok</span>
-                  </li>
-                  <li className="flex items-start gap-2 text-sm text-gray-700">
-                    <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span>Geração de prompts virais prontos</span>
-                  </li>
-                  <li className="flex items-start gap-2 text-sm font-semibold text-green-700 bg-green-50 p-3 rounded-lg">
-                    <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                    <span>Fonte de renda extra +R$ 3.900/mês</span>
-                  </li>
-                </ul>
+              <ul className="space-y-3 mb-8">
+                <li className="flex items-start gap-2 text-sm text-gray-700">
+                  <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>15 créditos renovados todo mês</span>
+                </li>
+                <li className="flex items-start gap-2 text-sm text-gray-700">
+                  <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>Geração automática de vídeos curtos e virais</span>
+                </li>
+                <li className="flex items-start gap-2 text-sm text-gray-700">
+                  <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>Tendências semanais do TikTok</span>
+                </li>
+                <li className="flex items-start gap-2 text-sm text-gray-700">
+                  <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>Geração de prompts virais prontos</span>
+                </li>
+                <li className="flex items-start gap-2 text-sm font-semibold text-green-700 bg-green-50 p-3 rounded-lg">
+                  <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                  <span>Fonte de renda extra +R$ 3.900/mês</span>
+                </li>
+              </ul>
 
-                <Button
-                  onClick={() => window.location.href = 'https://checkout.perfectpay.com.br/pay/PPU38CQ2L0K'}
-                  className="w-full h-14 text-lg bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white shadow-xl font-semibold"
-                >
-                  Comprar Agora
-                  <Sparkles className="ml-2 h-5 w-5" />
-                </Button>
+              <Button
+                onClick={() => window.location.href = 'https://checkout.perfectpay.com.br/pay/PPU38CQ2L0K'}
+                className="w-full h-14 text-lg bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white shadow-xl font-semibold"
+              >
+                Comprar Agora
+                <Sparkles className="ml-2 h-5 w-5" />
+              </Button>
 
-                <p className="text-center text-xs text-gray-500 mt-3">
-                  R$ 6.47 por crédito
-                </p>
-              </Card>
-            </motion.div>
+              <p className="text-center text-xs text-gray-500 mt-3">
+                R$ 6.47 por crédito
+              </p>
+            </Card>
+          </motion.div>
 
             {/* Upsell 1 - Prompts */}
             <motion.div

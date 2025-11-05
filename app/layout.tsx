@@ -53,7 +53,7 @@ export const metadata: Metadata = {
         type: 'image/png',
         sizes: '512x512',
         url: '/images/logos/favicon.png',
-      },
+  },
     ],
   },
   openGraph: {
